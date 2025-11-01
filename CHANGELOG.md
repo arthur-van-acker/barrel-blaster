@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2025-11-01
+
+### Added
+- Main game entry point in `js/main.js` with complete game loop implementation
+- DOMContentLoaded event listener for proper initialization timing
+- Canvas and 2D rendering context initialization with pixel-perfect settings
+- requestAnimationFrame-based game loop for smooth 60 FPS gameplay
+- Delta time calculation for frame-independent movement and animation
+- Delta time capping (0.1s max) to prevent spiral of death on lag spikes
+- Game state update and render methods with graceful GameState integration
+- Pause and resume functionality with proper frame time management
+- Game control functions: pauseGame(), resumeGame(), togglePause(), stopGame()
+- Placeholder rendering when GameState is not yet implemented
+- Console logging for initialization and state changes
+- Exported game control functions to window object for external access
+
+### Technical Details
+- Uses Constants.TARGET_FPS (60) for optimal frame rate targeting
+- Delta time calculated in seconds and capped at 0.1s maximum
+- Image smoothing disabled (imageSmoothingEnabled = false) for pixel-perfect rendering
+- Graceful fallback behavior when GameState class is not available
+- Proper error handling for missing canvas element or 2D context
+- Frame timing reset on resume to prevent large delta time jumps
+- Clean separation of init, update, and render concerns
+
 ## [0.3.0] - 2025-11-01
 
 ### Added
@@ -80,6 +105,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Project documentation: README.md
 - Git ignore rules for development environment
 
+[0.4.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.4.0
 [0.3.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.3.0
 [0.2.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.2.0
 [0.1.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.1.0
