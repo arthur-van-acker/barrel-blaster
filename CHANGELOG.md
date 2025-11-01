@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.0] - 2025-11-01
+
+### Added
+- Retro arcade CSS styling with dark theme
+- Canvas centering using flexbox layout
+- Pixel-perfect rendering (image-rendering: pixelated)
+- Disabled canvas smoothing for crisp pixel art
+- Scanline overlay effect for CRT monitor aesthetic
+- Animated glowing red border for arcade feel
+- Responsive design for multiple screen sizes (desktop, tablet, mobile)
+- MIT License file
+
+### Technical Details
+- Dark color scheme: #1a1a1a (body), #000000 (container), #000080 (canvas)
+- Courier New monospace font for retro typography
+- Media queries for responsive breakpoints at 1400px, 768px, and 480px
+
 ## [0.0.1] - 2025-11-01
 
 ### Added
@@ -21,4 +38,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Project documentation: README.md
 - Git ignore rules for development environment
 
+[0.1.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.1.0
 [0.0.1]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.0.1
