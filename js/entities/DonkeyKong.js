@@ -18,17 +18,16 @@ class DonkeyKong {
         this.width = 60;
         this.height = 60;
 
-        // Animation
+        // Animation state machine (issue #29)
+        this.animationState = 'idle'; // Current animation state: 'idle' or 'throw'
         this.animationFrame = 0;
         this.animationTimer = 0;
-        this.animationFPS = 4; // Animation speed
+        this.animationFPS = Constants.DK_ANIMATION_FPS; // Use constant from Constants.js
 
         // Barrel throwing
         this.throwTimer = 0;
         this.throwDelay = this.getRandomThrowDelay(); // Random delay between throws
-
-        // State
-        this.isThrowing = false;
+        this.throwAnimationDuration = 0.5; // Duration of throw animation in seconds (issue #29)
 
         // Color fallback
         this.color = '#8B4513'; // Brown color
@@ -66,11 +65,12 @@ class DonkeyKong {
 
     /**
      * Update DonkeyKong state
+     * Issue #29: Enhanced animation state machine
      * @param {number} deltaTime - Time elapsed since last frame in seconds
      * @returns {boolean} True if should spawn a new barrel
      */
     update(deltaTime) {
-        // Update animation
+        // Update animation frame timer
         this.animationTimer += deltaTime;
         const frameDuration = 1.0 / this.animationFPS;
 
@@ -82,20 +82,34 @@ class DonkeyKong {
         // Update throw timer
         this.throwTimer += deltaTime;
 
-        if (this.throwTimer >= this.throwDelay) {
-            this.throwTimer = 0;
-            this.throwDelay = this.getRandomThrowDelay(); // Get new random delay
-            this.isThrowing = true;
-            // Return true to signal barrel spawn
-            return true;
+        let shouldSpawnBarrel = false;
+
+        // Animation state machine (issue #29)
+        switch (this.animationState) {
+            case 'idle':
+                // Check if it's time to throw a barrel
+                if (this.throwTimer >= this.throwDelay) {
+                    // Transition to throw state
+                    this.animationState = 'throw';
+                    this.animationFrame = 0; // Reset animation frame for throw
+                    this.throwTimer = 0;
+                    shouldSpawnBarrel = true; // Spawn barrel when throw animation starts
+                }
+                break;
+
+            case 'throw':
+                // Stay in throw animation for duration
+                if (this.throwTimer >= this.throwAnimationDuration) {
+                    // Transition back to idle
+                    this.animationState = 'idle';
+                    this.animationFrame = 0; // Reset animation frame for idle
+                    this.throwTimer = 0;
+                    this.throwDelay = this.getRandomThrowDelay(); // Get new random delay
+                }
+                break;
         }
 
-        // Reset throwing animation after 0.5 seconds
-        if (this.isThrowing && this.throwTimer > 0.5) {
-            this.isThrowing = false;
-        }
-
-        return false;
+        return shouldSpawnBarrel;
     }
 
     /**
@@ -106,8 +120,8 @@ class DonkeyKong {
         const ctx = renderer.getContext();
 
         if (this.spriteSheetLoaded) {
-            // Choose sprite based on state
-            const sprites = this.isThrowing ? this.spriteConfig.throw : this.spriteConfig.idle;
+            // Choose sprite based on animation state (issue #29)
+            const sprites = this.animationState === 'throw' ? this.spriteConfig.throw : this.spriteConfig.idle;
             const frameIndex = this.animationFrame % sprites.length;
             const sprite = sprites[frameIndex];
 
@@ -137,7 +151,7 @@ class DonkeyKong {
 
             // Arms
             ctx.fillStyle = this.color;
-            if (this.isThrowing) {
+            if (this.animationState === 'throw') {
                 // Throwing pose - one arm up
                 ctx.fillRect(this.x + this.width * 0.7, this.y + this.height * 0.2,
                              this.width * 0.15, this.height * 0.3);
