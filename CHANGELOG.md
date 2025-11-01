@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.0] - 2025-11-01
+
+### Added
+- Ladder entity class in `js/entities/Ladder.js` for climbable vertical navigation
+- Ladder constructor accepting position (x, y), width (optional, defaults to Constants.LADDER_WIDTH), and height parameters
+- `render()` method for drawing ladders with vertical rails and horizontal rungs using retro cyan color (#00FFFF)
+- `canClimb()` method to check if entity is positioned correctly to climb (horizontal alignment and vertical overlap checks)
+- Entry/exit zones at top and bottom of ladder (2x rung height) for easy mounting/dismounting
+- Collision zone 4 pixels wider than visual representation on each side for easier climbing
+- Helper methods: `getBounds()`, `getCenterX()`, `isInTopEntryZone()`, `isInBottomEntryZone()`
+
+### Technical Details
+- Follows established entity pattern similar to Platform.js with render() and getBounds() methods
+- Visual rendering: 3px vertical rails on left/right, 2px horizontal rungs at 16px intervals (Constants.LADDER_RUNG_HEIGHT)
+- Collision detection uses Constants.LADDER_SNAP_DISTANCE (8px) for horizontal alignment tolerance
+- Entry zone height calculated as 2x Constants.LADDER_RUNG_HEIGHT (32px) at top and bottom
+- Uses existing constants: LADDER_WIDTH (32px), LADDER_RUNG_HEIGHT (16px), COLOR_LADDER (#00FFFF)
+- Comprehensive JSDoc documentation for constructor and all public methods
+- Ready for integration with Player entity climbing mechanics and Level construction
+- Pure vanilla JavaScript, no dependencies
+
 ## [0.10.0] - 2025-11-01
 
 ### Added
@@ -248,6 +269,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Project documentation: README.md
 - Git ignore rules for development environment
 
+[0.11.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.11.0
 [0.10.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.10.0
 [0.9.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.9.0
 [0.8.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.8.0
