@@ -105,8 +105,8 @@ const Constants = {
     DK_X: 180,
     DK_Y: 80,
 
-    // Animation speed
-    DK_ANIMATION_FPS: 4,
+    // Animation speed (issue #29: 8-12 FPS)
+    DK_ANIMATION_FPS: 10,
 
     // ===========================
     // PRINCESS CONSTANTS
