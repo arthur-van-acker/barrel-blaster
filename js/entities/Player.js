@@ -30,6 +30,7 @@ class Player {
         this.isOnGround = false;
         this.isClimbing = false;
         this.isOnLadder = false; // True when player is aligned with and on a ladder
+        this.isJumping = false; // True when player is in the upward phase of a jump
 
         // Facing direction: 1 = right, -1 = left
         this.facingDirection = 1;
@@ -61,6 +62,23 @@ class Player {
         // Handle jumping (only when not climbing and on ground)
         if (this.inputHandler.isJumpPressed() && this.isOnGround && !this.isClimbing) {
             this.jump();
+        }
+
+        // Handle variable jump height (issue #16)
+        // If player releases spacebar during upward movement, cut the jump short
+        if (this.isJumping && this.velocity.y < 0) {
+            // Check if spacebar is not being held (not pressed and not down)
+            const isSpaceDown = this.inputHandler.isKeyDown(' ') || this.inputHandler.isKeyDown('Space');
+            if (!isSpaceDown) {
+                // Cut the jump short for variable jump height
+                this.velocity.y *= Constants.JUMP_CUT_MULTIPLIER;
+                this.isJumping = false;
+            }
+        }
+
+        // Reset jumping flag when falling
+        if (this.velocity.y >= 0) {
+            this.isJumping = false;
         }
 
         // Apply physics (gravity disabled when climbing)
@@ -322,10 +340,12 @@ class Player {
 
     /**
      * Make the player jump
+     * Implements issue #16: jump mechanic with variable height
      */
     jump() {
         this.velocity.y = Constants.JUMP_VELOCITY;
         this.isOnGround = false;
+        this.isJumping = true;
     }
 
     /**
@@ -416,6 +436,7 @@ class Player {
         this.isOnGround = false;
         this.isClimbing = false;
         this.isOnLadder = false;
+        this.isJumping = false;
         this.currentLadder = null;
         this.facingDirection = 1;
     }

@@ -25,6 +25,9 @@ const Constants = {
     // Jump velocity (pixels per second, negative = upward)
     JUMP_VELOCITY: -400,
 
+    // Jump cut multiplier (for variable jump height when releasing spacebar early)
+    JUMP_CUT_MULTIPLIER: 0.4,
+
     // Friction coefficient for ground movement
     GROUND_FRICTION: 0.85,
 
