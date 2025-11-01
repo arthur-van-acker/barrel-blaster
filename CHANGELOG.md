@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.0] - 2025-11-01
+
+### Added
+- Smooth acceleration and deceleration for player horizontal movement
+- Screen bounds clamping to prevent player from moving off-screen
+- `PLAYER_ACCELERATION` constant (800 px/s²) for gradual speed increase
+- `PLAYER_DECELERATION` constant (1200 px/s²) for gradual speed decrease
+- `clampToScreenBounds()` method in Player class for boundary enforcement
+
+### Changed
+- Player horizontal movement now uses acceleration-based physics instead of instant velocity changes
+- Movement feels more realistic with gradual speed changes when pressing/releasing arrow keys
+- Deceleration replaces friction-based slowdown for more predictable stopping behavior
+
+### Technical Details
+- Modified `Player.handleMovement()` to apply acceleration over time using deltaTime
+- Player accelerates at 800 px/s² when arrow keys pressed, clamped to max speed of 150 px/s
+- Player decelerates at 1200 px/s² when no input, coming to complete stop smoothly
+- Screen bounds check prevents x-position from going below 0 or above canvas width
+- Y-position clamped to prevent falling through bottom of screen
+- Velocity reset to 0 when hitting screen boundaries
+- All movement calculations remain frame-independent via deltaTime integration
+- Facing direction tracking preserved from previous implementation
+- Climbing behavior unchanged (horizontal movement still disabled while on ladder)
+
+### Fixed
+- Player can no longer move off-screen horizontally
+- Player movement now feels more responsive and arcade-like
+- Eliminates jarring instant speed changes from previous implementation
+
 ## [0.13.0] - 2025-11-01
 
 ### Added
@@ -324,6 +354,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Project documentation: README.md
 - Git ignore rules for development environment
 
+[0.14.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.14.0
+[0.13.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.13.0
 [0.12.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.12.0
 [0.11.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.11.0
 [0.10.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.10.0
