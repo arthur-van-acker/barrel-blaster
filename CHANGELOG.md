@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2025-11-01
+
+### Added
+- Platform collision detection in Physics class
+- `checkPlatformCollision()` method for player-platform collision detection
+- Horizontal overlap detection to determine if player is above platform
+- Vertical distance checking with tolerance for smooth landing detection
+- Downward velocity validation (only collides when moving down or stationary)
+- Platform snap positioning for precise alignment to platform tops
+- Edge detection for falling off platform edges
+- Jump-through-from-below support (no collision when moving upward)
+- Comprehensive collision data return object with:
+  - `colliding`: boolean indicating if player should land on platform
+  - `snapY`: Y-coordinate to snap player to platform top (or null)
+- Input validation for null/undefined player and platform objects
+- Test suite (`test-platform-collision.html`) with 10 test cases and visual validation
+- Interactive demo (`demo-platform-collision.html`) with keyboard controls and multiple platforms
+
+### Technical Details
+- Uses `Constants.COLLISION_TOLERANCE` multiplied by 5 for landing detection threshold
+- Only triggers collision when player is above platform and moving downward or stationary
+- Allows jumping through platforms from below (upward velocity check)
+- Handles edge cases: player walking off edges, null inputs, zero velocity
+- O(1) time complexity for collision checks
+- O(1) space complexity with minimal allocations
+- Early exit optimization when no horizontal overlap detected
+- Returns structured data for flexible collision resolution
+- Comprehensive JSDoc documentation for the public API
+- Ready for integration with Player entity and Level system
+
 ## [0.8.0] - 2025-11-01
 
 ### Added
@@ -199,6 +229,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Project documentation: README.md
 - Git ignore rules for development environment
 
+[0.9.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.9.0
 [0.8.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.8.0
 [0.7.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.7.0
 [0.6.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.6.0
