@@ -1,0 +1,100 @@
+# Donkey Kong Project Configuration
+# This config tells Claude agents how to work with this vanilla JS project
+
+project:
+  name: "Donkey Kong"
+  type: "vanilla-js"
+  description: "Classic arcade game reimplemented in pure vanilla JavaScript (ES6+) with no build tools or dependencies"
+
+commands:
+  test: "echo '⚠️  No automated tests - manual browser testing required'"
+  build: "echo '✅ No build step - vanilla JS loads directly in browser'"
+  lint: "echo '⚠️  No linter configured - manual code review required'"
+  start: "python -m http.server 8000"
+  clean: "echo '✅ No build artifacts to clean'"
+  install: "echo '✅ No dependencies to install'"
+
+verification:
+  type: "browser"
+  url: "http://localhost:8000"
+  port: 8000
+  steps:
+    - "Start HTTP server: python -m http.server 8000"
+    - "Open browser to http://localhost:8000"
+    - "Open DevTools Console (F12) and check for errors"
+    - "Verify game loads and renders correctly"
+    - "Test player movement (arrow keys)"
+    - "Test jumping (spacebar)"
+    - "Test ladder climbing"
+    - "Test barrel spawning and collision"
+    - "Test game state transitions (menu, playing, pause, game over)"
+    - "Verify all acceptance criteria from issue"
+    - "Test on Chrome, Firefox, and Safari (if possible)"
+    - "Check for console.log statements that should be removed"
+
+quality_checks:
+  - "No console.log statements (except intentional debug logging)"
+  - "All game values use Constants.js (no hardcoded numbers)"
+  - "Check if new constants should be added to Constants.js"
+  - "Verify script loading order in index.html (dependencies first)"
+  - "Check for proper ES6 class structure (update/render methods)"
+  - "Verify canvas rendering is efficient (no unnecessary redraws)"
+  - "Check coordinate system consistency (origin top-left, Y+ down)"
+  - "Test at 60 FPS - watch for frame drops in DevTools Performance"
+  - "Verify retro arcade aesthetic (colors match Constants palette)"
+  - "Check browser DevTools for any warnings or errors"
+  - "Verify game runs on modern browsers (ES6+ support)"
+
+files:
+  entry_point: "index.html"
+  main_code: "js/"
+  tests: null
+  docs: ["README.md", "CLAUDE.md", "CHANGELOG.md"]
+  config: ["styles.css"]
+
+testing:
+  framework: "manual"
+  coverage_threshold: null
+  coverage_command: "echo 'No coverage - manual testing only'"
+  has_e2e: false
+  e2e_command: "echo 'Manual E2E testing in browser'"
+
+build:
+  output_dir: null
+  artifacts: []
+  minified: false
+
+deployment:
+  type: "static"
+  platform: "github-pages"
+  preview_url_pattern: null
+
+dependencies:
+  manager: "manual"
+  lock_file: null
+  audit_command: "echo 'No dependencies to audit'"
+  update_command: "echo 'No dependencies to update'"
+
+git:
+  main_branch: "main"
+  branch_prefix: "issue/"
+  require_issue: true
+  conventional_commits: true
+
+ci:
+  enabled: false
+  platform: null
+  config_file: null
+  required_checks: []
+
+# Donkey Kong specific notes
+notes:
+  - "This is a pure vanilla JS project - NO npm, webpack, or build tools"
+  - "All modules loaded via script tags in dependency order (see index.html:17-41)"
+  - "Constants.js is frozen - all game parameters centralized there"
+  - "60 FPS target using requestAnimationFrame()"
+  - "Canvas resolution: 1280x720 pixels"
+  - "Coordinate system: (0,0) = top-left, Y-axis increases downward"
+  - "File structure: js/utils/, js/systems/, js/entities/, js/level/"
+  - "Update CHANGELOG.md following Keep a Changelog format"
+  - "Use Semantic Versioning for tags"
