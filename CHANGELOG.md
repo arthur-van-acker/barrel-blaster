@@ -5,6 +5,44 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.17.0] - 2025-11-01
+
+### Added
+- Extensible Level class architecture with level number support
+- Static `Level.loadLevel(levelNumber)` factory method for creating levels
+- Entities array for managing game objects (barrels, hammers, etc.)
+- Player start position properties (`playerStartX`, `playerStartY`)
+- Princess end position properties (`princessX`, `princessY`)
+- Entity management methods: `addEntity()` and `removeEntity()`
+- Comprehensive getter methods for all level properties:
+  - `getEntities()` - Returns entities array
+  - `getPlayerStartPosition()` - Returns {x, y} for player start
+  - `getPrincessPosition()` - Returns {x, y} for princess location
+  - `getLevelNumber()` - Returns current level number
+- `initializeLevel()` dispatcher method for level-specific creation
+- Support for multiple levels with switch-based level selection
+
+### Changed
+- Level constructor now accepts `levelNumber` parameter
+- Level class refactored from hardcoded level 1 to extensible architecture
+- `render()` method now also renders entities if they have render methods
+- Level creation now uses dispatcher pattern for extensibility
+
+### Technical Details
+- Level number parameter enables multiple level support (1, 2, 3, etc.)
+- Switch statement in `initializeLevel()` dispatches to level creators
+- Levels 2 and 3 currently default to level 1 (placeholders for future levels)
+- Easy to extend by adding `createLevel2()`, `createLevel3()` methods
+- Backward compatible - existing level 1 layout preserved
+- Position management centralized in Level class
+- Entity array allows dynamic addition/removal of game objects
+- Factory pattern via static `loadLevel()` method
+- Clean API with comprehensive getter methods
+
+### Fixed
+- Level class now properly supports multiple levels
+- Foundation for level progression and variety
+
 ## [0.16.0] - 2025-11-01
 
 ### Added
@@ -452,6 +490,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Project documentation: README.md
 - Git ignore rules for development environment
 
+[0.17.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.17.0
 [0.16.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.16.0
 [0.15.2]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.15.2
 [0.15.1]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.15.1
