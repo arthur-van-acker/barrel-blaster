@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2025-11-01
+
+### Added
+- AABB (Axis-Aligned Bounding Box) collision detection in Physics class
+- `checkAABB()` method for rectangle-rectangle collision detection
+- Penetration depth calculation on both X and Y axes
+- Primary collision axis determination (minimum penetration)
+- Signed penetration values to preserve collision direction
+- Comprehensive collision data return object with:
+  - `colliding`: boolean indicating collision state
+  - `penetrationX`: signed X-axis penetration depth
+  - `penetrationY`: signed Y-axis penetration depth
+  - `penetrationDepth`: minimum absolute penetration depth
+  - `axis`: primary collision axis ('x' or 'y')
+- Edge case handling for zero/negative dimensions
+- Input validation for null/undefined rectangles
+- Test suite (`test-aabb.html`) with 10 test cases and visual validation
+
+### Technical Details
+- Center-based collision detection algorithm for efficiency
+- Early exit optimization when rectangles are separated
+- O(1) time complexity for collision checks
+- O(1) space complexity with minimal allocations
+- Returns comprehensive collision data for resolution strategies
+- Handles edge cases gracefully (zero dimensions return no collision)
+- Comprehensive JSDoc documentation for the public API
+- Ready for integration with game entities (Player, Barrel, Platform)
+
 ## [0.7.0] - 2025-11-01
 
 ### Added
@@ -171,6 +199,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Project documentation: README.md
 - Git ignore rules for development environment
 
+[0.8.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.8.0
 [0.7.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.7.0
 [0.6.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.6.0
 [0.5.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.5.0
