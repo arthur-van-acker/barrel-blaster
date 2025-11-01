@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.16.0] - 2025-11-01
+
+### Added
+- Player animation state machine with 4 distinct states
+- Animation state constants: `PLAYER_ANIM_STATE_IDLE`, `PLAYER_ANIM_STATE_WALK`, `PLAYER_ANIM_STATE_JUMP`, `PLAYER_ANIM_STATE_CLIMB`
+- Frame counter for animation timing at 8 FPS (`PLAYER_ANIMATION_FPS`)
+- `updateAnimationState()` method in Player class for automatic state management
+- Smooth state transitions that reset animation frame when state changes
+- Animation state tracking properties: `animationState`, `animationFrame`, `animationTimer`
+
+### Changed
+- Player now automatically updates animation state based on movement every frame
+- Animation state resets to idle when player is reset
+
+### Technical Details
+- Animation state priority: climb > jump > walk > idle
+- Idle state: player is stationary on ground
+- Walk state: player is moving horizontally (velocity.x > 1)
+- Jump state: player is airborne (not on ground)
+- Climb state: player is on ladder
+- Frame timing: 1/8 second per frame (8 FPS)
+- State transitions reset animationFrame to 0 and animationTimer to 0
+- Animation timer uses deltaTime for frame-independent animation
+- Foundation for future sprite sheet rendering with state-specific animations
+
+### Fixed
+- Provides foundation for visual feedback of player state
+- Enables future implementation of animated sprites
+
 ## [0.15.2] - 2025-11-01
 
 ### Documentation
@@ -423,6 +452,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Project documentation: README.md
 - Git ignore rules for development environment
 
+[0.16.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.16.0
 [0.15.2]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.15.2
 [0.15.1]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.15.1
 [0.15.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.15.0
