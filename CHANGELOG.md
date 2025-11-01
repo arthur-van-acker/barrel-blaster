@@ -5,6 +5,64 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.20.0] - 2025-11-01
+
+### Added
+- **Game class** with comprehensive state management system
+- Game states: `STATE_MENU`, `STATE_PLAYING`, `STATE_PAUSED`, `STATE_GAME_OVER`, `STATE_LEVEL_COMPLETE`
+- State transition methods:
+  - `startGame(levelNumber)` - Initialize and start new game
+  - `pause()` - Pause gameplay
+  - `resume()` - Resume gameplay
+  - `togglePause()` - Toggle between paused and playing
+  - `gameOver()` - Transition to game over state
+  - `returnToMenu()` - Return to main menu
+- **Menu screen rendering**:
+  - Title display: "DONKEY KONG"
+  - Instructions: "PRESS SPACE TO START"
+  - Controls help: Arrow keys, Space, P for pause
+  - High score display
+- **Pause overlay rendering**:
+  - Semi-transparent black overlay (70% opacity)
+  - "PAUSED" text
+  - Resume instructions
+- **Game over screen rendering**:
+  - "GAME OVER" title
+  - Final score display
+  - High score display
+  - Continue instructions
+- **Level complete screen** (placeholder for future implementation)
+- **High score tracking** across game sessions
+- **Keyboard input handling** for state transitions:
+  - Space/Enter: Start game (menu), Continue (game over)
+  - P/Escape: Pause/resume game
+- `js/Game.js` - New main Game class file (405 lines)
+
+### Changed
+- `main.js` now creates `Game` instance instead of `GameState` directly
+- `main.js` game loop simplified - pause state handled by Game class
+- Removed `isPaused` flag from main.js (managed internally by Game)
+- `pauseGame()`, `resumeGame()`, `togglePause()` functions now delegate to Game class
+- Game initialization starts in MENU state instead of PLAYING state
+- `index.html` updated to include `js/Game.js` script tag
+
+### Technical Details
+- **Clean architecture**: Game class wraps GameState for separation of concerns
+  - Game class: High-level state management (menu, pause, game over)
+  - GameState class: Gameplay entity management (player, level, score, lives)
+- **State-based dispatching**: Update and render methods dispatch based on current state
+- **GameState lifecycle**: Created when starting game, cleaned up on menu return
+- **Automatic game over**: Triggered when player lives reach 0
+- **High score comparison**: Updates high score when current score exceeds it
+- **Input handler**: Separate InputHandler for menu navigation
+- **Extensible design**: Easy to add new states, transitions, and screens
+
+### Fixed
+- Game now has proper menu system instead of starting directly in gameplay
+- Pause state properly managed with visual feedback
+- Game over flow implemented with score display
+- State transitions properly handled with cleanup
+
 ## [0.19.0] - 2025-11-01
 
 ### Added
