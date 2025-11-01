@@ -136,7 +136,7 @@ This project uses vanilla JavaScript with no build tools or dependencies. To mod
 
 See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
 
-Latest: **v0.21.0** - Player sprite rendering with animations
+Latest: **v0.22.0** - Kenney Platformer Character sprites
 
 ## License
 
