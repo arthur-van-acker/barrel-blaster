@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.19.0] - 2025-11-01
+
+### Added
+- **Level loading system** for GameState with level number support
+- GameState constructor now accepts optional `levelNumber` parameter (default: 1)
+- `loadLevel(levelNumber)` method for transitioning between levels
+- Level-specific player spawn positioning using `level.getPlayerStartPosition()`
+- Current level number tracking in GameState (`currentLevelNumber`)
+- TODO comments for future DonkeyKong entity spawning integration
+
+### Changed
+- GameState now uses `Level.loadLevel(levelNumber)` instead of `new Level()`
+- Player spawns at level-specific start position instead of hardcoded constants
+- `reset()` method updated to use level-specific player start position
+- GameState constructor parameters: `(canvas, renderer, levelNumber = 1)`
+
+### Technical Details
+- Uses factory pattern: `Level.loadLevel(1)` returns Level1 configuration
+- Level transitions supported via `loadLevel(levelNumber)` method
+- Player position now controlled by level configuration, not hardcoded constants
+- Extensible for Level2, Level3, etc.
+- Backward compatible (defaults to level 1 if no parameter provided)
+- Foundation for level progression and transition system
+- DonkeyKong entity integration prepared (TODO comments in place)
+
+### Fixed
+- Player now correctly spawns at level-specific start positions
+- Level loading integrated with game state management
+- Proper separation between game state and level configuration
+
 ## [0.18.0] - 2025-11-01
 
 ### Added
