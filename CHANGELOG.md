@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.24.0] - 2025-11-01
+
+### Added
+- **Player-barrel collision detection** (issue #25)
+  - AABB collision detection between player and barrels
+  - Player loses life when hit by barrel
+  - Invincibility period after being hit (2 seconds via INVINCIBILITY_DURATION)
+  - Visual flashing effect during invincibility (8 Hz flash rate)
+  - Player respawns at start position with temporary invincibility
+  - Game over state triggered when lives reach 0
+- **Player damage system**
+  - takeDamage() method with invincibility check
+  - Invincibility timer management in Player.update()
+  - Invincibility state reset on player respawn
+
+### Changed
+- Player.render() now skips rendering during flash frames for invincibility effect
+- Player.reset() grants invincibility on respawn for safety
+- GameState checks barrel collisions every frame
+
 ## [0.23.0] - 2025-11-01
 
 ### Added
