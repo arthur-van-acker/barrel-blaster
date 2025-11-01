@@ -5,6 +5,41 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.22.0] - 2025-11-01
+
+### Added
+- **Kenney Platformer Character sprites** integration
+  - High-quality 80×110 pixel character sprites
+  - [Platformer Characters Pack](https://kenney.nl/assets/platformer-characters) by Kenney (CC0 License)
+  - Sprite animations for all player states (idle, walk, jump, climb)
+  - Automatic sprite loading from `assets/sprites/player.png`
+  - Fallback to procedural rendering if sprites fail to load
+- **Sprite assets directory** (`assets/sprites/`)
+  - Player sprite sheet (720×330 pixels, 9 columns × 3 rows)
+  - CC0 license file for Kenney assets
+  - Preview and sample images for reference
+- **Proper asset attribution**
+  - Kenney credits in README.md
+  - CC0 license documentation in code comments
+  - Link to original asset pack
+
+### Changed
+- **Player.js sprite configuration**
+  - Updated to load 80×110px sprites (was procedural rectangles)
+  - Sprite dimensions: `spriteWidth: 80`, `spriteHeight: 110`
+  - No margins in Kenney Platformer pack (cleaner extraction)
+  - Sprite rendering with canvas `drawImage()` scaling
+- **README.md credits section**
+  - Now references Kenney Platformer Characters Pack
+  - Links to Kenney.nl for proper attribution
+
+### Technical Details
+- **Sprite sheet layout**: 9 columns × 3 rows, no margins
+- **Sprite extraction**: Direct 80px horizontal spacing
+- **Scaling**: Sprites scaled from 80×110 to player size (40×50)
+- **Animation mapping**: idle (col 0), walk (cols 1-2), jump (col 3), climb (cols 4-5)
+- **Graceful fallback**: Procedural rendering if sprite load fails
+
 ## [0.21.0] - 2025-11-01
 
 ### Added
