@@ -146,7 +146,8 @@ MIT License - Feel free to use and modify for your own projects.
 
 - Inspired by classic 1980s arcade platform-climbing games
 - Educational reimplementation for learning game development
-- All code and assets are original or open-source (CC0)
+- **Sprites**: [Platformer Characters Pack](https://kenney.nl/assets/platformer-characters) by [Kenney](https://kenney.nl) (CC0 License)
+- All code is original, created for this project
 
 ## Contributing
 

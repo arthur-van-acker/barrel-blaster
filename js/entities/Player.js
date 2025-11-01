@@ -49,6 +49,52 @@ class Player {
         // Physics object for compatibility with Physics class
         this.position = { x: this.x, y: this.y };
         this.velocity = { x: this.velocityX, y: this.velocityY };
+
+        // Sprite sheet loading
+        // Sprites: Platformer Characters Pack by Kenney (www.kenney.nl)
+        // License: CC0 (Public Domain) - See assets/sprites/LICENSE-kenney.txt
+        this.spriteSheet = new Image();
+        this.spriteSheet.src = 'assets/sprites/player.png';
+        this.spriteSheetLoaded = false;
+        this.spriteSheet.onload = () => {
+            this.spriteSheetLoaded = true;
+            console.log('Player sprite sheet loaded successfully (Kenney Platformer)');
+        };
+        this.spriteSheet.onerror = () => {
+            console.warn('Failed to load player sprite sheet, using fallback rendering');
+            this.spriteSheetLoaded = false;
+        };
+
+        // Sprite configuration
+        // Kenney Platformer sprites: 80x110 pixels, no margins
+        // Tilesheet: 720x330 = 9 columns x 3 rows
+        this.spriteWidth = 80;
+        this.spriteHeight = 110;
+        this.spriteSpacing = 0;   // No margin in platformer pack
+
+        // Sprite positions in tilesheet (estimated layout)
+        // Note: May need adjustment based on actual tilesheet layout
+        this.spriteConfig = {
+            // Idle animation (1 frame) - usually first sprite
+            idle: [{ x: 0, y: 0 }],
+
+            // Walk animation (2 frames alternating)
+            walk: [
+                { x: 1, y: 0 },  // walk1
+                { x: 2, y: 0 },  // walk2
+                { x: 1, y: 0 },  // walk1
+                { x: 0, y: 0 }   // idle (pause in cycle)
+            ],
+
+            // Jump animation (1 frame)
+            jump: [{ x: 3, y: 0 }],
+
+            // Climb animation (2 frames)
+            climb: [
+                { x: 4, y: 0 },  // climb1
+                { x: 5, y: 0 }   // climb2
+            ]
+        };
     }
 
     /**
@@ -449,6 +495,7 @@ class Player {
 
     /**
      * Render the player with visual animation (issue #20)
+     * Uses sprite sheet if loaded, otherwise falls back to procedural rendering
      * @param {Renderer} renderer - The game renderer
      */
     render(renderer) {
@@ -466,28 +513,76 @@ class Player {
             ctx.translate(-this.x, -this.y);
         }
 
-        // Render based on animation state (issue #20)
-        switch (this.animationState) {
-            case Constants.PLAYER_ANIM_STATE_IDLE:
-                this.renderIdle(renderer);
-                break;
-            case Constants.PLAYER_ANIM_STATE_WALK:
-                this.renderWalk(renderer);
-                break;
-            case Constants.PLAYER_ANIM_STATE_JUMP:
-                this.renderJump(renderer);
-                break;
-            case Constants.PLAYER_ANIM_STATE_CLIMB:
-                this.renderClimb(renderer);
-                break;
-            default:
-                // Fallback to simple rectangle
-                renderer.drawRect(this.x, this.y, this.width, this.height, this.color);
-                break;
+        // Use sprite rendering if sprite sheet is loaded
+        if (this.spriteSheetLoaded) {
+            this.renderSprite(renderer, ctx);
+        } else {
+            // Fallback to procedural rendering based on animation state
+            switch (this.animationState) {
+                case Constants.PLAYER_ANIM_STATE_IDLE:
+                    this.renderIdle(renderer);
+                    break;
+                case Constants.PLAYER_ANIM_STATE_WALK:
+                    this.renderWalk(renderer);
+                    break;
+                case Constants.PLAYER_ANIM_STATE_JUMP:
+                    this.renderJump(renderer);
+                    break;
+                case Constants.PLAYER_ANIM_STATE_CLIMB:
+                    this.renderClimb(renderer);
+                    break;
+                default:
+                    // Fallback to simple rectangle
+                    renderer.drawRect(this.x, this.y, this.width, this.height, this.color);
+                    break;
+            }
         }
 
         // Restore canvas state
         renderer.restore();
+    }
+
+    /**
+     * Render sprite from sprite sheet
+     * @param {Renderer} renderer - The game renderer
+     * @param {CanvasRenderingContext2D} ctx - Canvas context
+     */
+    renderSprite(renderer, ctx) {
+        // Determine which sprite config to use based on animation state
+        let spriteArray;
+        switch (this.animationState) {
+            case Constants.PLAYER_ANIM_STATE_IDLE:
+                spriteArray = this.spriteConfig.idle;
+                break;
+            case Constants.PLAYER_ANIM_STATE_WALK:
+                spriteArray = this.spriteConfig.walk;
+                break;
+            case Constants.PLAYER_ANIM_STATE_JUMP:
+                spriteArray = this.spriteConfig.jump;
+                break;
+            case Constants.PLAYER_ANIM_STATE_CLIMB:
+                spriteArray = this.spriteConfig.climb;
+                break;
+            default:
+                spriteArray = this.spriteConfig.idle;
+                break;
+        }
+
+        // Get current sprite frame
+        const frameIndex = this.animationFrame % spriteArray.length;
+        const sprite = spriteArray[frameIndex];
+
+        // Calculate source position in sprite sheet
+        // Platformer sprites have no margin, so multiply by sprite dimensions
+        const srcX = sprite.x * this.spriteWidth;
+        const srcY = sprite.y * this.spriteHeight;
+
+        // Draw sprite scaled to player size
+        ctx.drawImage(
+            this.spriteSheet,
+            srcX, srcY, this.spriteWidth, this.spriteHeight,  // Source: 80x110 pixels
+            this.x, this.y, this.width, this.height           // Destination: scaled to player size (40x50)
+        );
     }
 
     /**
