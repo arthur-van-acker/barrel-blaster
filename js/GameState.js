@@ -54,6 +54,10 @@ class GameState {
         // Initialize barrels array (issue #28)
         this.barrels = [];
 
+        // Initialize hammers array (issue #36)
+        this.hammers = [];
+        this.spawnHammers();
+
         // Score and lives (placeholders)
         this.score = 0;
         this.lives = Constants.PLAYER_STARTING_LIVES;
@@ -124,7 +128,15 @@ class GameState {
         // Remove dead barrels (issue #28)
         this.barrels = this.barrels.filter(barrel => barrel.isActive());
 
-        // Check player-barrel collisions (issue #25)
+        // Update hammers (issue #36)
+        for (const hammer of this.hammers) {
+            hammer.update(deltaTime);
+        }
+
+        // Check player-hammer collision (issue #36)
+        this.checkPlayerHammerCollision();
+
+        // Check player-barrel collisions (issue #25/#36)
         this.checkPlayerBarrelCollisions();
 
         // Check win condition (issue #34)
@@ -180,6 +192,11 @@ class GameState {
             barrel.render(renderer);
         }
 
+        // Render hammers (issue #36)
+        for (const hammer of this.hammers) {
+            hammer.render(renderer);
+        }
+
         // Render player
         this.player.render(renderer);
 
@@ -219,6 +236,19 @@ class GameState {
                 Constants.CANVAS_WIDTH / 2,
                 30,
                 Constants.COLOR_LADDER,
+                '20px monospace',
+                'center'
+            );
+        }
+
+        // Hammer timer (issue #36)
+        if (this.player.hasHammer) {
+            const timeLeft = Math.ceil(this.player.hammerTimer);
+            renderer.drawText(
+                `HAMMER: ${timeLeft}s`,
+                Constants.CANVAS_WIDTH / 2,
+                60,
+                Constants.COLOR_UI_YELLOW,
                 '20px monospace',
                 'center'
             );
@@ -308,8 +338,8 @@ class GameState {
     }
 
     /**
-     * Check collision between player and barrels (issue #25)
-     * Handles player death, life loss, and game over
+     * Check collision between player and barrels (issue #25/#36)
+     * Handles player death, life loss, game over, and barrel destruction with hammer
      */
     checkPlayerBarrelCollisions() {
         const playerBounds = this.player.getBounds();
@@ -328,7 +358,15 @@ class GameState {
             );
 
             if (colliding) {
-                // Try to damage player (returns false if invincible)
+                // If player has hammer, destroy barrel (issue #36)
+                if (this.player.hasHammer) {
+                    barrel.destroy();
+                    this.score += Constants.POINTS_BARREL_SMASH;
+                    // Continue checking other barrels
+                    continue;
+                }
+
+                // Otherwise, try to damage player (issue #25)
                 const damageTaken = this.player.takeDamage();
 
                 if (damageTaken) {
@@ -345,7 +383,7 @@ class GameState {
                     }
                 }
 
-                // Only check one barrel collision per frame
+                // Only check one barrel collision per frame (when not destroying)
                 break;
             }
         }
@@ -381,5 +419,24 @@ class GameState {
             // Transition to level complete state
             this.currentState = Constants.STATE_LEVEL_COMPLETE;
         }
+    }
+
+    /**
+     * Check player-hammer collision (issue #36)
+     */
+    checkPlayerHammerCollision() {
+        for (const hammer of this.hammers) {
+            if (hammer.checkCollision(this.player)) {
+                this.player.pickupHammer();
+            }
+        }
+    }
+
+    /**
+     * Spawn hammer power-ups on platforms (issue #36)
+     */
+    spawnHammers() {
+        // Place one hammer on platform 2 (middle of level)
+        this.hammers.push(new Hammer(500, Constants.PLATFORM_2 - 40));
     }
 }

@@ -39,6 +39,10 @@ class Player {
         this.isInvincible = false;
         this.invincibilityTimer = 0;
 
+        // Hammer power-up (issue #36)
+        this.hasHammer = false;
+        this.hammerTimer = 0;
+
         // Current ladder reference (null when not climbing)
         this.currentLadder = null;
 
@@ -170,6 +174,15 @@ class Player {
             if (this.invincibilityTimer <= 0) {
                 this.isInvincible = false;
                 this.invincibilityTimer = 0;
+            }
+        }
+
+        // Update hammer timer (issue #36)
+        if (this.hasHammer) {
+            this.hammerTimer -= deltaTime;
+            if (this.hammerTimer <= 0) {
+                this.hasHammer = false;
+                this.hammerTimer = 0;
             }
         }
 
@@ -565,6 +578,30 @@ class Player {
 
         // Restore canvas state
         renderer.restore();
+
+        // Draw hammer indicator (issue #36)
+        if (this.hasHammer) {
+            const hammerX = this.x + this.width + 5;
+            const hammerY = this.y - 10;
+            const hammerSize = 16;
+
+            ctx.save();
+            ctx.fillStyle = '#FFD700'; // Gold color
+            ctx.strokeStyle = '#8B4513'; // Brown
+            ctx.lineWidth = 2;
+
+            // Draw simple hammer shape
+            // Handle
+            ctx.fillRect(hammerX + hammerSize / 4, hammerY + hammerSize / 4,
+                         hammerSize / 8, hammerSize * 0.75);
+            // Head
+            ctx.fillRect(hammerX, hammerY,
+                         hammerSize * 0.6, hammerSize / 2);
+            ctx.strokeRect(hammerX, hammerY,
+                           hammerSize * 0.6, hammerSize / 2);
+
+            ctx.restore();
+        }
     }
 
     /**
@@ -789,6 +826,14 @@ class Player {
     }
 
     /**
+     * Pick up hammer power-up (issue #36)
+     */
+    pickupHammer() {
+        this.hasHammer = true;
+        this.hammerTimer = Constants.HAMMER_DURATION;
+    }
+
+    /**
      * Reset player to starting position
      * @param {number} x - X position
      * @param {number} y - Y position
@@ -814,5 +859,8 @@ class Player {
         // Reset invincibility (issue #25)
         this.isInvincible = true; // Grant invincibility on respawn
         this.invincibilityTimer = Constants.INVINCIBILITY_DURATION;
+        // Reset hammer (issue #36)
+        this.hasHammer = false;
+        this.hammerTimer = 0;
     }
 }
