@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.0] - 2025-11-01
+
+### Added
+- Platform entity class in `js/entities/Platform.js` for static platform objects
+- Platform constructor accepting position (x, y), width, height, and optional color parameter
+- `render()` method for drawing platforms to the canvas using Renderer
+- `getBounds()` method returning collision boundary data as {x, y, width, height}
+- Support for custom platform colors with default fallback to `Constants.COLOR_PLATFORM`
+- Created `js/entities/` directory for game entity classes
+
+### Technical Details
+- Static entity with no movement or update logic (no update method needed)
+- Renders as solid colored rectangles via `Renderer.drawRect()`
+- Collision bounds match visual bounds precisely for accurate physics
+- Color parameter defaults to red (#FF0000) from Constants for classic arcade look
+- Ready for integration with Level construction and collision detection systems
+- Follows established entity pattern with render() and getBounds() methods
+- Comprehensive JSDoc documentation for constructor and all public methods
+
 ## [0.9.0] - 2025-11-01
 
 ### Added
@@ -229,6 +248,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Project documentation: README.md
 - Git ignore rules for development environment
 
+[0.10.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.10.0
 [0.9.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.9.0
 [0.8.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.8.0
 [0.7.0]: https://github.com/bearded-wizard/donkey-kong/releases/tag/v0.7.0
