@@ -3,6 +3,12 @@
  *
  * Manages the game state, entities, and game loop logic.
  * Coordinates updates and rendering for all game objects.
+ *
+ * Implements issue #32: Level loading system
+ * - Loads levels by number using Level.loadLevel()
+ * - Player spawns at level-specific start position
+ * - Level transitions support (loadLevel method)
+ * - Extensible for multiple levels
  */
 
 class GameState {
@@ -10,8 +16,9 @@ class GameState {
      * Create a new game state
      * @param {HTMLCanvasElement} canvas - The game canvas
      * @param {Renderer} renderer - The renderer instance
+     * @param {number} levelNumber - The level number to load (default: 1)
      */
-    constructor(canvas, renderer) {
+    constructor(canvas, renderer, levelNumber = 1) {
         this.canvas = canvas;
         this.renderer = renderer;
 
@@ -21,19 +28,57 @@ class GameState {
         // Initialize input handler
         this.inputHandler = new InputHandler();
 
-        // Initialize level
-        this.level = new Level();
+        // Current level number
+        this.currentLevelNumber = levelNumber;
 
-        // Initialize player
+        // Initialize level using Level.loadLevel() factory method (issue #32)
+        this.level = Level.loadLevel(this.currentLevelNumber);
+
+        // Get player start position from level (issue #32)
+        const playerStart = this.level.getPlayerStartPosition();
+
+        // Initialize player at level start position (issue #32)
         this.player = new Player(
-            Constants.PLAYER_START_X,
-            Constants.PLAYER_START_Y,
+            playerStart.x,
+            playerStart.y,
             this.inputHandler
         );
+
+        // TODO: Initialize DonkeyKong entity at level top when DonkeyKong class is implemented (issue #32)
+        // const dkPosition = { x: Constants.DK_X, y: Constants.DK_Y };
+        // this.donkeyKong = new DonkeyKong(dkPosition.x, dkPosition.y);
 
         // Score and lives (placeholders)
         this.score = 0;
         this.lives = Constants.PLAYER_STARTING_LIVES;
+    }
+
+    /**
+     * Load a level by number (issue #32)
+     * Allows transitioning between different levels
+     * @param {number} levelNumber - The level number to load
+     */
+    loadLevel(levelNumber) {
+        // Store the new level number
+        this.currentLevelNumber = levelNumber;
+
+        // Load the new level using Level.loadLevel() factory method
+        this.level = Level.loadLevel(levelNumber);
+
+        // Get player start position from level
+        const playerStart = this.level.getPlayerStartPosition();
+
+        // Reset player to level start position
+        this.player.reset(playerStart.x, playerStart.y);
+
+        // TODO: Reset DonkeyKong entity when DonkeyKong class is implemented
+        // const dkPosition = { x: Constants.DK_X, y: Constants.DK_Y };
+        // if (this.donkeyKong) {
+        //     this.donkeyKong.reset(dkPosition.x, dkPosition.y);
+        // }
+
+        // Reset game state
+        this.currentState = Constants.STATE_PLAYING;
     }
 
     /**
@@ -146,11 +191,22 @@ class GameState {
 
     /**
      * Reset game to initial state
+     * Reloads current level and resets player position (issue #32)
      */
     reset() {
         this.score = 0;
         this.lives = Constants.PLAYER_STARTING_LIVES;
-        this.player.reset();
+
+        // Get player start position from current level
+        const playerStart = this.level.getPlayerStartPosition();
+        this.player.reset(playerStart.x, playerStart.y);
+
+        // TODO: Reset DonkeyKong entity when DonkeyKong class is implemented
+        // if (this.donkeyKong) {
+        //     const dkPosition = { x: Constants.DK_X, y: Constants.DK_Y };
+        //     this.donkeyKong.reset(dkPosition.x, dkPosition.y);
+        // }
+
         this.currentState = Constants.STATE_PLAYING;
     }
 }
