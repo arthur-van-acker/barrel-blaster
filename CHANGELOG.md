@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.0] - 2025-11-01
+
+### Added
+- Player `facingDirection` property to track which direction the player is facing (1 = right, -1 = left)
+- Automatic facing direction updates during horizontal movement (left/right arrow keys)
+- Facing direction reset in player reset() method
+
+### Technical Details
+- Completes the Player class skeleton technical requirements from issue #14
+- Property initialized to 1 (facing right) in constructor
+- Updates to -1 when moving left, 1 when moving right
+- Maintains facing direction when player is not moving (doesn't reset until player reset)
+- Prepares foundation for future animated sprite implementation with directional sprites
+
 ## [0.12.0] - 2025-11-01
 
 ### Added
