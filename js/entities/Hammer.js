@@ -32,7 +32,7 @@ class Hammer {
         // Sprite loading
         // Custom hammer sprite (retro arcade style)
         this.spriteSheet = new Image();
-        this.spriteSheet.src = 'assets/sprites/hammer.png';
+        this.spriteSheet.src = 'assets/sprites/hammer.png?v=2'; // Cache bust
         this.spriteSheetLoaded = false;
         this.spriteSheet.onload = () => {
             this.spriteSheetLoaded = true;
