@@ -159,6 +159,16 @@ class Game {
             }
         }
 
+        // Handle level complete input
+        if (this.currentState === Constants.STATE_LEVEL_COMPLETE ||
+            (this.gameState && this.gameState.currentState === Constants.STATE_LEVEL_COMPLETE)) {
+            // Press Space or Enter to return to menu (for now, until multiple levels are implemented)
+            if (this.inputHandler.isKeyPressed(' ') ||
+                this.inputHandler.isKeyPressed('Enter')) {
+                this.returnToMenu();
+            }
+        }
+
         // Handle game over input
         if (this.currentState === Constants.STATE_GAME_OVER) {
             // Press Space or Enter to return to menu
