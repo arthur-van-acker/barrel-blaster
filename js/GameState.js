@@ -71,6 +71,11 @@ class GameState {
         // Climbing tracking for scoring (issue #38)
         this.lastClimbingY = null; // Track last Y position while climbing
         this.climbingDistance = 0; // Total distance climbed
+
+        // Death and respawn handling (issue #39)
+        this.isRespawning = false;
+        this.respawnTimer = 0;
+        this.respawnDelay = 1.5; // seconds
     }
 
     /**
@@ -154,6 +159,27 @@ class GameState {
     update(deltaTime) {
         if (this.currentState !== Constants.STATE_PLAYING) {
             return;
+        }
+
+        // Handle respawn delay (issue #39)
+        if (this.isRespawning) {
+            this.respawnTimer += deltaTime;
+
+            if (this.respawnTimer >= this.respawnDelay) {
+                // Respawn completed
+                this.isRespawning = false;
+                this.respawnTimer = 0;
+
+                // Respawn player at start position
+                const playerStart = this.level.getPlayerStartPosition();
+                this.player.reset(playerStart.x, playerStart.y);
+
+                // Clear all barrels for safety (issue #39)
+                this.barrels = [];
+            } else {
+                // During respawn delay, skip game updates
+                return;
+            }
         }
 
         // Update level timer (issue #38)
@@ -293,8 +319,10 @@ class GameState {
             hammer.render(renderer);
         }
 
-        // Render player
-        this.player.render(renderer);
+        // Render player (hide during respawn) (issue #39)
+        if (!this.isRespawning) {
+            this.player.render(renderer);
+        }
 
         // Render UI
         this.renderUI(renderer);
@@ -343,6 +371,19 @@ class GameState {
                 30,
                 Constants.COLOR_LADDER,
                 '20px monospace',
+                'center'
+            );
+        }
+
+        // Respawn countdown (issue #39)
+        if (this.isRespawning) {
+            const timeLeft = Math.ceil(this.respawnDelay - this.respawnTimer);
+            renderer.drawText(
+                `RESPAWNING... ${timeLeft}`,
+                Constants.CANVAS_WIDTH / 2,
+                Constants.CANVAS_HEIGHT / 2,
+                Constants.COLOR_UI_YELLOW,
+                '32px monospace',
                 'center'
             );
         }
@@ -422,6 +463,10 @@ class GameState {
         this.lastClimbingY = null;
         this.climbingDistance = 0;
 
+        // Reset respawn state (issue #39)
+        this.isRespawning = false;
+        this.respawnTimer = 0;
+
         // Get player start position from current level
         const playerStart = this.level.getPlayerStartPosition();
         this.player.reset(playerStart.x, playerStart.y);
@@ -446,6 +491,22 @@ class GameState {
         const spawnPos = this.donkeyKong.getBarrelSpawnPosition();
         const barrel = new Barrel(spawnPos.x, spawnPos.y);
         this.barrels.push(barrel);
+    }
+
+    /**
+     * Handle player losing a life (issue #39)
+     */
+    loseLife() {
+        this.lives--;
+
+        if (this.lives <= 0) {
+            // Game over
+            this.currentState = Constants.STATE_GAME_OVER;
+        } else {
+            // Start respawn sequence
+            this.isRespawning = true;
+            this.respawnTimer = 0;
+        }
     }
 
     /**
@@ -492,21 +553,12 @@ class GameState {
                     continue;
                 }
 
-                // Otherwise, try to damage player (issue #25)
+                // Otherwise, try to damage player (issue #25/#39)
                 const damageTaken = this.player.takeDamage();
 
                 if (damageTaken) {
-                    // Player took damage
-                    this.lives--;
-
-                    if (this.lives <= 0) {
-                        // Game over
-                        this.currentState = Constants.STATE_GAME_OVER;
-                    } else {
-                        // Respawn player
-                        const playerStart = this.level.getPlayerStartPosition();
-                        this.player.reset(playerStart.x, playerStart.y);
-                    }
+                    // Player took damage - lose a life
+                    this.loseLife();
                 }
 
                 // Only check one barrel collision per frame (when not destroying)
