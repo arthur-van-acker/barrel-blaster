@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.37.1] - 2025-11-02
+
+### Added
+- **GitHub Pages deployment**
+  - Live demo now available at https://arthur-van-acker.github.io/barrel-blaster/
+  - Added prominent live demo link at top of README
+  - Updated installation section with GitHub Pages as easiest play option
+  - Set repository homepage URL to GitHub Pages deployment
+
+### Documentation
+- README updated with live demo links in multiple sections
+- Installation guide now prioritizes online play option
+- Repository settings updated with homepage URL
+
 ## [0.37.0] - 2025-11-02
 
 ### Added
