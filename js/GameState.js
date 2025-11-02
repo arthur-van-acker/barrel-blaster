@@ -62,10 +62,57 @@ class GameState {
         this.score = 0;
         this.lives = Constants.PLAYER_STARTING_LIVES;
 
+        // High score (loaded from localStorage)
+        this.highScore = this.loadHighScore();
+
+        // Level timer for time bonus (issue #38)
+        this.levelTimer = 0;
+
+        // Climbing tracking for scoring (issue #38)
+        this.lastClimbingY = null; // Track last Y position while climbing
+        this.climbingDistance = 0; // Total distance climbed
+
         // Death and respawn handling (issue #39)
         this.isRespawning = false;
         this.respawnTimer = 0;
         this.respawnDelay = 1.5; // seconds
+    }
+
+    /**
+     * Load high score from localStorage (issue #38)
+     * @returns {number} The saved high score, or 0 if none exists
+     */
+    loadHighScore() {
+        try {
+            const saved = localStorage.getItem('barrelBlasterHighScore');
+            return saved ? parseInt(saved, 10) : 0;
+        } catch (error) {
+            console.warn('Failed to load high score from localStorage:', error);
+            return 0;
+        }
+    }
+
+    /**
+     * Save high score to localStorage (issue #38)
+     */
+    saveHighScore() {
+        try {
+            if (this.score > this.highScore) {
+                this.highScore = this.score;
+                localStorage.setItem('barrelBlasterHighScore', this.highScore.toString());
+            }
+        } catch (error) {
+            console.warn('Failed to save high score to localStorage:', error);
+        }
+    }
+
+    /**
+     * Add points to score (issue #38)
+     * @param {number} points - Points to add
+     */
+    addScore(points) {
+        this.score += points;
+        this.saveHighScore();
     }
 
     /**
@@ -79,6 +126,11 @@ class GameState {
 
         // Load the new level using Level.loadLevel() factory method
         this.level = Level.loadLevel(levelNumber);
+
+        // Reset level timer and climbing tracking (issue #38)
+        this.levelTimer = 0;
+        this.lastClimbingY = null;
+        this.climbingDistance = 0;
 
         // Get player start position from level
         const playerStart = this.level.getPlayerStartPosition();
@@ -130,12 +182,18 @@ class GameState {
             }
         }
 
+        // Update level timer (issue #38)
+        this.levelTimer += deltaTime;
+
         // Update player
         this.player.update(
             deltaTime,
             this.level.getPlatforms(),
             this.level.getLadders()
         );
+
+        // Track climbing distance for scoring (issue #38)
+        this.trackClimbingScore();
 
         // Update DonkeyKong and handle barrel spawning (issue #28)
         const shouldSpawnBarrel = this.donkeyKong.update(deltaTime);
@@ -197,6 +255,44 @@ class GameState {
     }
 
     /**
+     * Track climbing distance and award points (issue #38)
+     * Awards 10 points per meter climbed upward
+     */
+    trackClimbingScore() {
+        if (this.player.isClimbing) {
+            // If this is the first frame of climbing, store starting Y position
+            if (this.lastClimbingY === null) {
+                this.lastClimbingY = this.player.y;
+            } else {
+                // Calculate distance climbed (negative = up, positive = down)
+                const deltaY = this.lastClimbingY - this.player.y;
+
+                // Only award points for upward movement
+                if (deltaY > 0) {
+                    this.climbingDistance += deltaY;
+
+                    // Award points for each meter (100 pixels = 1 meter)
+                    const metersClimbed = Math.floor(this.climbingDistance / 100);
+                    if (metersClimbed > 0) {
+                        const pointsToAward = metersClimbed * Constants.POINTS_CLIMBING_PER_METER;
+                        this.addScore(pointsToAward);
+
+                        // Reset climbing distance counter (keep remainder)
+                        this.climbingDistance = this.climbingDistance % 100;
+                    }
+                }
+
+                // Update last position
+                this.lastClimbingY = this.player.y;
+            }
+        } else {
+            // Reset climbing tracking when not climbing
+            this.lastClimbingY = null;
+            this.climbingDistance = 0;
+        }
+    }
+
+    /**
      * Render game graphics
      * @param {Renderer} renderer - The renderer instance
      */
@@ -247,6 +343,16 @@ class GameState {
             'left'
         );
 
+        // High Score (issue #38)
+        renderer.drawText(
+            `HIGH SCORE: ${this.highScore}`,
+            Constants.CANVAS_WIDTH / 2,
+            30,
+            Constants.COLOR_UI_YELLOW,
+            '20px monospace',
+            'center'
+        );
+
         // Lives
         renderer.drawText(
             `LIVES: ${this.lives}`,
@@ -269,7 +375,7 @@ class GameState {
             );
         }
 
-        // Respawn message (issue #39)
+        // Respawn countdown (issue #39)
         if (this.isRespawning) {
             const timeLeft = Math.ceil(this.respawnDelay - this.respawnTimer);
             renderer.drawText(
@@ -283,7 +389,7 @@ class GameState {
         }
 
         // Hammer timer (issue #36)
-        if (this.player.hasHammer && !this.isRespawning) {
+        if (this.player.hasHammer) {
             const timeLeft = Math.ceil(this.player.hammerTimer);
             renderer.drawText(
                 `HAMMER: ${timeLeft}s`,
@@ -352,6 +458,11 @@ class GameState {
         this.score = 0;
         this.lives = Constants.PLAYER_STARTING_LIVES;
 
+        // Reset level timer and climbing tracking (issue #38)
+        this.levelTimer = 0;
+        this.lastClimbingY = null;
+        this.climbingDistance = 0;
+
         // Reset respawn state (issue #39)
         this.isRespawning = false;
         this.respawnTimer = 0;
@@ -383,25 +494,24 @@ class GameState {
     }
 
     /**
-     * Handle player death and life loss (issue #39)
-     * Manages lives, respawn delay, and game over state
+     * Handle player losing a life (issue #39)
      */
     loseLife() {
         this.lives--;
 
         if (this.lives <= 0) {
-            // Game over - no more lives
+            // Game over
             this.currentState = Constants.STATE_GAME_OVER;
         } else {
-            // Start respawn sequence with delay (issue #39)
+            // Start respawn sequence
             this.isRespawning = true;
             this.respawnTimer = 0;
         }
     }
 
     /**
-     * Check collision between player and barrels (issue #25/#36/#39)
-     * Handles player death, life loss, game over, and barrel destruction with hammer
+     * Check collision between player and barrels (issue #25/#36/#38)
+     * Handles player death, life loss, game over, barrel destruction with hammer, and barrel jumping
      */
     checkPlayerBarrelCollisions() {
         const playerBounds = this.player.getBounds();
@@ -419,20 +529,35 @@ class GameState {
                 playerBounds.y + playerBounds.height > barrelBounds.y
             );
 
+            // Check if player jumped over barrel (issue #38)
+            // Player is above barrel, horizontally overlapping, and is jumping/falling
+            const jumpedOver = !colliding &&
+                              playerBounds.x < barrelBounds.x + barrelBounds.width &&
+                              playerBounds.x + playerBounds.width > barrelBounds.x &&
+                              playerBounds.y + playerBounds.height < barrelBounds.y &&
+                              this.player.velocityY > 0 && // Falling
+                              !barrel.jumpedOver; // Haven't awarded points for this barrel yet
+
+            if (jumpedOver) {
+                // Award points for jumping over barrel
+                this.addScore(Constants.POINTS_BARREL_JUMP);
+                barrel.jumpedOver = true; // Mark barrel to prevent multiple awards
+            }
+
             if (colliding) {
                 // If player has hammer, destroy barrel (issue #36)
                 if (this.player.hasHammer) {
                     barrel.destroy();
-                    this.score += Constants.POINTS_BARREL_SMASH;
+                    this.addScore(Constants.POINTS_BARREL_SMASH);
                     // Continue checking other barrels
                     continue;
                 }
 
-                // Otherwise, try to damage player (issue #25)
+                // Otherwise, try to damage player (issue #25/#39)
                 const damageTaken = this.player.takeDamage();
 
                 if (damageTaken) {
-                    // Player took damage - handle life loss and respawn (issue #39)
+                    // Player took damage - lose a life
                     this.loseLife();
                 }
 
@@ -443,7 +568,7 @@ class GameState {
     }
 
     /**
-     * Check win condition - player reaching princess (issue #34)
+     * Check win condition - player reaching princess (issue #34/#38)
      */
     checkWinCondition() {
         if (this.currentState !== Constants.STATE_PLAYING) {
@@ -462,12 +587,13 @@ class GameState {
         );
 
         if (colliding) {
-            // Award completion points
-            this.score += Constants.POINTS_REACH_PRINCESS;
+            // Award completion points (issue #38)
+            this.addScore(Constants.POINTS_REACH_PRINCESS);
 
-            // TODO: Calculate and award time bonus (future enhancement)
-            // const timeBonus = (Constants.LEVEL_TIME_LIMIT - this.elapsedTime) * Constants.POINTS_TIME_BONUS;
-            // this.score += timeBonus;
+            // Calculate and award time bonus (issue #38)
+            const timeRemaining = Math.max(0, Constants.LEVEL_TIME_LIMIT - this.levelTimer);
+            const timeBonus = Math.floor(timeRemaining * Constants.POINTS_TIME_BONUS);
+            this.addScore(timeBonus);
 
             // Transition to level complete state
             this.currentState = Constants.STATE_LEVEL_COMPLETE;
