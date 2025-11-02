@@ -257,3 +257,142 @@ body {
 #game-container {
     animation: glow 3s ease-in-out infinite;
 }
+
+/* === Page Content Styling === */
+.page-content {
+    width: 100%;
+    max-width: 900px;
+    padding: 40px;
+    color: #ffffff;
+    line-height: 1.6;
+}
+
+.content-section {
+    margin-bottom: 30px;
+}
+
+.section-title {
+    font-size: 24px;
+    color: #ff0000;
+    margin-bottom: 15px;
+    text-shadow: 0 0 8px rgba(255, 0, 0, 0.6);
+    letter-spacing: 2px;
+    border-bottom: 2px solid #ff0000;
+    padding-bottom: 8px;
+}
+
+.content-text {
+    font-size: 16px;
+    color: #cccccc;
+    margin-bottom: 15px;
+    letter-spacing: 0.5px;
+}
+
+.content-text strong {
+    color: #ffffff;
+}
+
+.content-link {
+    color: #00ffff;
+    text-decoration: none;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.content-link:hover {
+    color: #ffffff;
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.8);
+}
+
+.content-list {
+    list-style-type: square;
+    margin-left: 30px;
+    margin-bottom: 15px;
+    color: #cccccc;
+}
+
+.content-list li {
+    margin-bottom: 8px;
+}
+
+.attribution-prominent {
+    font-size: 20px;
+    color: #00ffff;
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+    margin-bottom: 10px;
+}
+
+.center-text {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.back-link {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: #ff0000;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    border: 2px solid #ff0000;
+    transition: all 0.3s ease;
+}
+
+.back-link:hover {
+    background-color: #000000;
+    border-color: #ffffff;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+}
+
+/* === Responsive Page Content === */
+@media screen and (max-width: 768px) {
+    .page-content {
+        padding: 30px 20px;
+    }
+
+    .section-title {
+        font-size: 20px;
+    }
+
+    .content-text {
+        font-size: 14px;
+    }
+
+    .attribution-prominent {
+        font-size: 18px;
+    }
+
+    .back-link {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .page-content {
+        padding: 20px 15px;
+    }
+
+    .section-title {
+        font-size: 18px;
+        letter-spacing: 1px;
+    }
+
+    .content-text {
+        font-size: 13px;
+    }
+
+    .attribution-prominent {
+        font-size: 16px;
+    }
+
+    .content-list {
+        margin-left: 20px;
+    }
+
+    .back-link {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+}

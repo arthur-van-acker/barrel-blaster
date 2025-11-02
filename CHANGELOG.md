@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.42.0] - 2025-11-02
+
+### Added
+- **About page with credits and attribution** (issue #126)
+  - Created standalone about.html with complete HTML structure
+  - About the Game section describing Barrel Blaster and educational purpose
+  - Credits section with developer and repository information
+  - Prominent Asset Attribution section for Kenney sprites
+  - Technology section listing vanilla JavaScript and HTML5 Canvas
+  - Educational Purpose disclaimer about Donkey Kong clone status
+  - Link back to main game with styled button
+  - Comprehensive CSS styling for page content in styles.css
+  - Responsive design across all breakpoints (≤768px, ≤480px)
+  - Proper meta tags and page title
+
+### Technical Details
+- Page content styled with .page-content wrapper (max-width: 900px)
+- Section titles with red glow effect (#ff0000) matching game aesthetic
+- Content links in cyan (#00ffff) with hover glow effect
+- Kenney attribution prominently displayed in larger cyan text
+- Back button styled as arcade-style button with red background
+- Responsive typography: 24px → 20px → 18px for section titles
+- Content text: 16px → 14px → 13px across breakpoints
+- Links to GitHub repository and Kenney.nl with proper attribution
+- CC0 license information clearly stated for sprite assets
+- Semantic HTML5 structure with header, sections, and footer
+- Reuses existing styles.css for consistent retro arcade aesthetic
+
 ## [0.41.0] - 2025-11-02
 
 ### Added
