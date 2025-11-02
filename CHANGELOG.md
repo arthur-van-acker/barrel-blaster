@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.41.0] - 2025-11-02
+
+### Added
+- **Game footer with navigation and copyright** (issue #123)
+  - Added semantic `<footer>` element with page navigation
+  - Navigation links in `<nav>` element:
+    - About / Credits → about.html
+    - How to Play / Rules → rules.html
+    - License → license.html
+  - Copyright notice: "© 2025 Barrel Blaster | MIT License"
+  - CSS styling matching retro arcade aesthetic with hover effects
+  - Responsive design for tablet (≤768px) and mobile (≤480px)
+  - Proper semantic HTML5 structure (footer > nav > links)
+
+### Technical Details
+- Footer positioned below game canvas using flex-column layout
+- Link styling: Cyan (#00ffff) with hover glow effect and 0.3s transitions
+- Separator styling: Gray pipes (|) between links (#555555)
+- Copyright styling: Muted gray text (#666666)
+- Responsive behavior:
+  - Desktop: Inline links with separators (14px font)
+  - Tablet: Smaller fonts (13px links, 11px copyright)
+  - Mobile: Vertical link stacking, hidden separators (12px links)
+- Color coordination with header tagline and ladder colors
+
 ## [0.40.0] - 2025-11-02
 
 ### Added
