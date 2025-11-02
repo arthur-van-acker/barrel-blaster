@@ -48,6 +48,9 @@ out/
 .env.test.local
 .env.production.local
 
+# User Configuration
+game.config.json
+
 # Logs
 logs/
 *.log
