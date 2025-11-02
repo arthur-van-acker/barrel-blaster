@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.46.0] - 2025-11-02
+
+### Added
+- **Footer styling with pixel art accents** (issue #125)
+  - Enhanced game footer with retro arcade aesthetic
+  - Pixel art corner accents (16x16 red squares in bottom corners)
+  - Pixel art divider after navigation links using cyan gradient pattern
+  - Border and background styling matching header design
+  - Enhanced link hover effects with borders, glow, and background
+  - Red separator pipes matching accent color scheme
+  - Responsive sizing for all breakpoints (≤1400px, ≤768px, ≤480px)
+  - Improved copyright text styling with subtle glow effect
+
+### Technical Details
+- Footer border: 4px solid #ff0000 with inset shadow
+- Background: #0a0a0a matching header depth effect
+- Corner accents: Positioned at bottom corners with nested box-shadows
+- Divider pattern: Linear gradient creating dotted pixel effect (200px wide, cyan #00ffff)
+- Link hover states: Border (#00ffff), background (rgba(0,255,255,0.1)), glow shadow
+- Link padding: 8px 12px for better touch targets
+- Responsive corner sizes: 16px → 12px → 8px
+- Responsive divider width: 200px → 150px → 120px
+- Maximum width: 1280px matching header and game canvas
+- Separator color: #ff0000 (bold) for visual accent
+
 ## [0.45.0] - 2025-11-02
 
 ### Added
