@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.34.0] - 2025-11-02
+
+### Added
+- **Background music** (issue #42)
+  - Looping retro-style background music during gameplay
+  - "Retro Beat" from Kenney Music Loops (CC0 license)
+  - Seamless loop transition for continuous playback
+  - Music automatically starts when game enters playing state
+  - Music stops when level completes or game ends
+  - Music restarts when loading new levels or resetting game
+- **Music state management**
+  - GameState.setState() now handles music playback control
+  - Music plays continuously during STATE_PLAYING
+  - Music stops during STATE_LEVEL_COMPLETE and STATE_GAME_OVER
+  - Proper state transition handling for music start/stop
+- **Music constant** in Constants.js
+  - MUSIC_BACKGROUND constant for music file path
+
+### Changed
+- GameState.initializeAudio() loads background music in addition to sound effects
+- GameState.setState() enhanced with music state management
+- All direct state assignments now use setState() for proper music control
+- GameState methods (reset, loadLevel, loseLife, checkWinCondition) updated to use setState()
+
+### Technical Details
+- 8-bit chiptune style music suitable for arcade gameplay
+- AudioManager handles music as single instance (not pooled)
+- Music loaded with isMusic=true flag for proper volume management
+- Lower music volume (0.5) than sound effects (0.8) for proper audio balance
+- Promise-based async music loading with error handling
+
 ## [0.33.0] - 2025-11-02
 
 ### Added

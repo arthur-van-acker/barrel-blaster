@@ -84,7 +84,7 @@ class GameState {
     }
 
     /**
-     * Initialize audio system and load all sound effects (issues #40, #41)
+     * Initialize audio system and load all sound effects (issues #40, #41, #42)
      */
     initializeAudio() {
         const sounds = {
@@ -96,9 +96,22 @@ class GameState {
             level_complete: Constants.SOUND_LEVEL_COMPLETE
         };
 
+        // Load sound effects
         this.audioManager.loadSounds(sounds)
             .catch(error => {
                 console.warn('Some sounds failed to load:', error);
+            });
+
+        // Load background music (issue #42)
+        this.audioManager.loadSound('background_music', Constants.MUSIC_BACKGROUND, true)
+            .then(() => {
+                // Start playing background music when loaded
+                if (this.currentState === Constants.STATE_PLAYING) {
+                    this.audioManager.playSound('background_music', true);
+                }
+            })
+            .catch(error => {
+                console.warn('Background music failed to load:', error);
             });
     }
 
@@ -173,7 +186,7 @@ class GameState {
         this.barrels = [];
 
         // Reset game state
-        this.currentState = Constants.STATE_PLAYING;
+        this.setState(Constants.STATE_PLAYING);
     }
 
     /**
@@ -467,11 +480,26 @@ class GameState {
     }
 
     /**
-     * Change game state
+     * Change game state (issue #42: handle background music state)
      * @param {string} newState - The new game state
      */
     setState(newState) {
+        const oldState = this.currentState;
         this.currentState = newState;
+
+        // Handle background music based on state changes (issue #42)
+        if (this.audioManager && this.audioManager.hasSound('background_music')) {
+            // Stop music when game ends or level completes
+            if (newState === Constants.STATE_GAME_OVER ||
+                newState === Constants.STATE_LEVEL_COMPLETE) {
+                this.audioManager.stopSound('background_music');
+            }
+            // Start music when entering playing state from non-playing state
+            else if (newState === Constants.STATE_PLAYING &&
+                     oldState !== Constants.STATE_PLAYING) {
+                this.audioManager.playSound('background_music', true);
+            }
+        }
     }
 
     /**
@@ -505,7 +533,7 @@ class GameState {
         // Clear barrels array (issue #28)
         this.barrels = [];
 
-        this.currentState = Constants.STATE_PLAYING;
+        this.setState(Constants.STATE_PLAYING);
     }
 
     /**
@@ -535,7 +563,7 @@ class GameState {
 
         if (this.lives <= 0) {
             // Game over
-            this.currentState = Constants.STATE_GAME_OVER;
+            this.setState(Constants.STATE_GAME_OVER);
         } else {
             // Start respawn sequence
             this.isRespawning = true;
@@ -641,7 +669,7 @@ class GameState {
             }
 
             // Transition to level complete state
-            this.currentState = Constants.STATE_LEVEL_COMPLETE;
+            this.setState(Constants.STATE_LEVEL_COMPLETE);
         }
     }
 

@@ -234,6 +234,9 @@ const Constants = {
     SOUND_HAMMER_PICKUP: 'assets/sounds/hammer_pickup.ogg',
     SOUND_BARREL_DESTROY: 'assets/sounds/barrel_destroy.ogg',
     SOUND_LEVEL_COMPLETE: 'assets/sounds/level_complete.ogg',
+
+    // Music file paths
+    MUSIC_BACKGROUND: 'assets/sounds/music.ogg',
 };
 
 // Freeze the object to prevent modifications
