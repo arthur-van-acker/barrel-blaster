@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.44.0] - 2025-11-02
+
+### Added
+- **License page with legal information** (issue #128)
+  - Created standalone license.html with complete HTML structure
+  - Code License section with full MIT License text
+  - Asset Licenses section for Kenney sprite packs
+  - Clear separation between code (MIT) and assets (CC0)
+  - Copyright notice: © 2025 Donkey Kong Project Contributors
+  - Full MIT License text with plain English explanation
+  - Full CC0 License text for Kenney assets
+  - Links to official license texts (opensource.org, creativecommons.org)
+  - License summary section with last updated date
+  - License-specific CSS styling (license boxes, subsections)
+  - Link back to main game with styled arcade button
+  - Responsive design across all breakpoints (≤768px, ≤480px)
+  - Proper meta tags and page title
+
+### Technical Details
+- License boxes styled with dark background (#0a0a0a) and red border accent
+- Code license: MIT License for Barrel Blaster source code
+- Asset license: CC0 Public Domain for Kenney sprite packs
+- Subsection titles in cyan (#00ffff) with glow effect
+- License text in readable gray (#aaaaaa) with increased line height (1.7)
+- Responsive license boxes: 20px → 15px → 12px padding
+- Links to Kenney.nl and official license documentation
+- "What this means" sections for non-lawyers
+- Last updated: November 2, 2025
+- Semantic HTML5 structure with header, sections, and footer
+- Extends page content CSS with license-specific classes
+
 ## [0.41.0] - 2025-11-02
 
 ### Added
