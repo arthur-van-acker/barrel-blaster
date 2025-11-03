@@ -5,6 +5,51 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.55.0] - 2025-11-03
+
+### Added
+- **Touch coordinate to button mapping system** (issue #148)
+  - Complete touch event handling for mobile controls with accurate hit detection
+  - Multi-touch support allowing simultaneous button presses (move + jump)
+  - Touch coordinate conversion from screen space to canvas space with proper scaling
+  - Button boundary checking using AABB collision detection
+  - Touch tracking using Map data structure (touchId -> buttonName)
+  - Support for all touch events: touchstart, touchmove, touchend, touchcancel
+  - Haptic feedback on button press (20ms vibration pulse)
+  - Touch dead zone handling to prevent accidental inputs
+  - Prevention of default touch behaviors (scrolling, zooming)
+
+### Changed
+- **MobileControls touch event handlers**
+  - `handleTouchStart()` detects button press and updates InputHandler state
+  - `handleTouchMove()` tracks finger movement across buttons with smooth transitions
+  - `handleTouchEnd()` releases buttons when touch ends
+  - `handleTouchCancel()` properly handles cancelled touches
+  - `getTouchedButton()` performs accurate hit detection for touch coordinates
+  - All touch handlers convert screen coordinates to canvas coordinates with scaling
+  - Active touches stored in Map for independent multi-touch tracking
+  - Proper integration with InputHandler.setTouchButton() for unified input
+
+### Technical Details
+- Touch coordinate conversion accounts for canvas scaling: `(clientX - rect.left) * scaleX`
+- Canvas bounds retrieved per-event for accurate coordinate mapping
+- Hit detection checks if touch is within button boundaries (x, y, width, height)
+- Multi-touch support: each touch tracked by unique touch.identifier
+- Touch state synchronized with InputHandler for keyboard + touch integration
+- All touch events use `{ passive: false }` to allow preventDefault()
+- Zero missed inputs - touch tracking persists across move events
+- Zero stuck inputs - touchcancel and touchend properly release buttons
+- Graceful handling of multiple simultaneous touches on different buttons
+- Haptic feedback uses Navigator.vibrate() API when available
+- Touch dead zone defined via MOBILE_TOUCH_DEAD_ZONE constant (10px)
+
+### Documentation
+- Comprehensive JSDoc comments for all touch event handlers
+- Inline documentation explaining coordinate conversion logic
+- Touch tracking Map structure documented with examples
+- All acceptance criteria from issue #148 fully met
+- Code follows CLAUDE.md conventions and Constants.js pattern
+
 ## [0.54.0] - 2025-11-03
 
 ### Added
