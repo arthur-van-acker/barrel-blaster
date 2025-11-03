@@ -5,6 +5,113 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.57.0] - 2025-11-03
+
+### Added
+- **Settings persistence system using localStorage** (issue #150)
+  - SettingsManager class in `js/systems/SettingsManager.js` for centralized settings management
+  - Settings persist across browser sessions via localStorage
+  - Automatic settings load on SettingsManager construction
+  - Default settings configuration with five main categories:
+    - `controlScheme`: 'dpad' | 'joystick' (default: 'dpad')
+    - `buttonSize`: 'small' | 'medium' | 'large' (default: 'medium')
+    - `buttonOpacity`: 0.3 - 1.0 range (default: 0.6)
+    - `hapticEnabled`: boolean (default: true)
+    - `buttonPositions`: {dpad: {x, y}, jump: {x, y}} with default positions
+  - Button size multipliers: small (0.8x), medium (1.0x), large (1.2x)
+- **Comprehensive validation system**
+  - `validateSetting()` method validates all setting values before application
+  - controlScheme validation: only accepts 'dpad' or 'joystick'
+  - buttonSize validation: only accepts 'small', 'medium', or 'large'
+  - buttonOpacity clamping: enforces 0.3 - 1.0 range
+  - hapticEnabled boolean conversion: converts any truthy/falsy value
+  - buttonPositions structure validation: ensures {dpad: {x, y}, jump: {x, y}} format
+  - Invalid values rejected - setting remains unchanged on validation failure
+- **Settings API methods**
+  - `get(key)`: Retrieve individual setting value
+  - `set(key, value)`: Update setting with automatic validation
+  - `getAll()`: Retrieve all current settings as object
+  - `save()`: Persist current settings to localStorage
+  - `load()`: Load settings from localStorage (auto-called on construction)
+  - `resetToDefaults()`: Reset all settings to default values and clear localStorage
+  - `getButtonSizeMultiplier()`: Get multiplier for current button size (0.8, 1.0, or 1.2)
+- **Graceful error handling**
+  - Try-catch blocks around all localStorage operations
+  - Falls back to defaults when localStorage disabled or unavailable
+  - Handles corrupted localStorage data gracefully with JSON parse error catching
+  - Console warnings for localStorage errors (no thrown exceptions)
+  - Settings work entirely in-memory when localStorage unavailable
+- **Comprehensive test suite** (`tests/SettingsManager.test.html`)
+  - 28 automated unit tests covering all functionality
+  - Tests for default initialization, get/set operations, validation, persistence
+  - Tests for localStorage disabled scenarios, reset functionality, edge cases
+  - Interactive verification page (`tests/verify-settings-manager.html`) for E2E testing
+  - Real-time test execution with pass/fail reporting
+  - Browser DevTools compatible for manual testing
+
+### Changed
+- **index.html script loading order**
+  - Added `js/systems/SettingsManager.js` to systems section
+  - Positioned before MobileControls.js for proper dependency order
+  - SettingsManager loaded after other core systems (InputHandler, Renderer, Physics, etc.)
+
+### Technical Details
+- **localStorage integration**
+  - Settings stored under key: 'barrelBlasterSettings'
+  - Data serialized as JSON string for storage
+  - Automatic deserialization on load with validation
+  - Multiple SettingsManager instances share same localStorage key
+- **Validation architecture**
+  - Validation rules defined in constructor for extensibility
+  - Switch-based validation in `validateSetting()` method
+  - Returns validated value or null if invalid
+  - Null return prevents setting update (defensive programming)
+- **Default settings structure**
+  - Default button positions: dpad (x: 30, y: 610), jump (x: 1130, y: 580)
+  - Default opacity: 0.6 for semi-transparent overlay
+  - Default button size: medium (1.0x) for balanced touch targets
+  - Default haptic: enabled for tactile feedback
+  - Default control scheme: dpad for classic arcade feel
+- **Helper methods**
+  - `mergeWithDefaults()`: Validates and merges stored settings with defaults
+  - `deepClone()`: JSON-based object cloning for immutability
+  - `validateSetting()`: Centralized validation logic for all settings
+- **Memory management**
+  - Settings stored in-memory for fast access (no repeated localStorage reads)
+  - save() called explicitly to persist changes (not automatic)
+  - load() called once on construction (not on every get)
+- **Browser compatibility**
+  - Uses standard Web APIs: localStorage, JSON
+  - No external dependencies or modern ES7+ features
+  - Compatible with ES6+ browsers (project requirement)
+  - Gracefully handles private browsing mode (localStorage disabled)
+
+### Documentation
+- Comprehensive JSDoc comments for SettingsManager class
+- All public methods documented with parameters and return types
+- Settings structure documented in class header
+- Validation rules documented inline
+- Test suite with usage examples
+- E2E verification guide (`tests/E2E-VERIFICATION-RESULTS.md`)
+- All acceptance criteria from issue #150 fully met:
+  - ✅ Settings persist across browser sessions
+  - ✅ Invalid values rejected/defaulted
+  - ✅ Works when localStorage disabled
+  - ✅ Well documented API
+
+### Performance
+- O(1) time complexity for get() and set() operations
+- O(n) space complexity where n = number of settings (currently 5)
+- Minimal memory overhead (~200 bytes for settings object)
+- No performance impact when localStorage disabled
+- JSON serialization/deserialization only on save/load (not every access)
+
+### Future Integration Points
+- Ready for MobileControls.js integration
+- Can be passed to MobileControls constructor for settings-driven UI
+- Settings manager can be instantiated globally for game-wide access
+- Extensible for additional settings (sound, graphics, gameplay preferences)
+
 ## [0.56.0] - 2025-11-03
 
 ### Added

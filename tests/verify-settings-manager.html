@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SettingsManager E2E Verification</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #00ffff;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #ff0000;
+            text-shadow: 0 0 10px #ff0000;
+        }
+        h2 {
+            color: #ffff00;
+            margin-top: 30px;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #0a0a0a;
+            border: 2px solid #666;
+        }
+        button {
+            background: #ff0000;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #cc0000;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            background: #000;
+            border-left: 4px solid #00ffff;
+        }
+        .success {
+            border-left-color: #00ff00;
+            color: #00ff00;
+        }
+        .error {
+            border-left-color: #ff0000;
+            color: #ff0000;
+        }
+        input, select {
+            background: #000;
+            color: #00ffff;
+            border: 2px solid #00ffff;
+            padding: 5px 10px;
+            font-family: 'Courier New', monospace;
+            margin: 5px;
+        }
+        label {
+            display: inline-block;
+            width: 150px;
+            color: #ffff00;
+        }
+    </style>
+</head>
+<body>
+    <h1>SettingsManager E2E Verification</h1>
+    <p>Interactive verification of SettingsManager functionality</p>
+
+    <!-- Test 1: Basic Get/Set -->
+    <div class="section">
+        <h2>Test 1: Basic Get/Set Operations</h2>
+        <button onclick="testGetSet()">Run Test</button>
+        <div id="result-getset" class="result"></div>
+    </div>
+
+    <!-- Test 2: Persistence -->
+    <div class="section">
+        <h2>Test 2: localStorage Persistence</h2>
+        <button onclick="testPersistence()">Save Settings</button>
+        <button onclick="testLoad()">Load Settings (Refresh Page)</button>
+        <button onclick="clearStorage()">Clear localStorage</button>
+        <div id="result-persistence" class="result"></div>
+    </div>
+
+    <!-- Test 3: Validation -->
+    <div class="section">
+        <h2>Test 3: Value Validation</h2>
+        <button onclick="testValidation()">Run Validation Tests</button>
+        <div id="result-validation" class="result"></div>
+    </div>
+
+    <!-- Test 4: Reset to Defaults -->
+    <div class="section">
+        <h2>Test 4: Reset to Defaults</h2>
+        <button onclick="testReset()">Reset to Defaults</button>
+        <div id="result-reset" class="result"></div>
+    </div>
+
+    <!-- Test 5: Interactive Settings Editor -->
+    <div class="section">
+        <h2>Test 5: Interactive Settings Editor</h2>
+        <div>
+            <label>Control Scheme:</label>
+            <select id="controlScheme">
+                <option value="dpad">D-Pad</option>
+                <option value="joystick">Joystick</option>
+            </select>
+        </div>
+        <div>
+            <label>Button Size:</label>
+            <select id="buttonSize">
+                <option value="small">Small (0.8x)</option>
+                <option value="medium">Medium (1.0x)</option>
+                <option value="large">Large (1.2x)</option>
+            </select>
+        </div>
+        <div>
+            <label>Button Opacity:</label>
+            <input type="range" id="buttonOpacity" min="0.3" max="1.0" step="0.1" value="0.6">
+            <span id="opacityValue">0.6</span>
+        </div>
+        <div>
+            <label>Haptic Feedback:</label>
+            <input type="checkbox" id="hapticEnabled" checked>
+        </div>
+        <button onclick="applySettings()">Apply Settings</button>
+        <button onclick="loadCurrentSettings()">Load Current Settings</button>
+        <div id="result-interactive" class="result"></div>
+    </div>
+
+    <!-- Test 6: Current State Display -->
+    <div class="section">
+        <h2>Current Settings State</h2>
+        <button onclick="displayCurrentState()">Refresh State</button>
+        <div id="current-state" class="result"></div>
+    </div>
+
+    <!-- Load SettingsManager -->
+    <script src="../js/systems/SettingsManager.js"></script>
+
+    <script>
+        // Create global manager instance
+        const manager = new SettingsManager();
+
+        // Test 1: Basic Get/Set
+        function testGetSet() {
+            const result = document.getElementById('result-getset');
+            try {
+                // Test get()
+                const scheme = manager.get('controlScheme');
+                const opacity = manager.get('buttonOpacity');
+
+                // Test set()
+                manager.set('controlScheme', 'joystick');
+                const newScheme = manager.get('controlScheme');
+
+                // Test getAll()
+                const all = manager.getAll();
+
+                result.className = 'result success';
+                result.innerHTML = `
+                    ✅ GET operations working<br>
+                    - Initial controlScheme: ${scheme}<br>
+                    - Initial buttonOpacity: ${opacity}<br>
+                    - After set: ${newScheme}<br>
+                    - getAll() returned ${Object.keys(all).length} settings
+                `;
+            } catch (error) {
+                result.className = 'result error';
+                result.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+
+        // Test 2: Persistence
+        function testPersistence() {
+            const result = document.getElementById('result-persistence');
+            try {
+                manager.set('controlScheme', 'joystick');
+                manager.set('buttonSize', 'large');
+                manager.set('buttonOpacity', 0.9);
+                manager.set('hapticEnabled', false);
+                manager.save();
+
+                const stored = localStorage.getItem('barrelBlasterSettings');
+                const parsed = JSON.parse(stored);
+
+                result.className = 'result success';
+                result.innerHTML = `
+                    ✅ Settings saved to localStorage<br>
+                    - controlScheme: ${parsed.controlScheme}<br>
+                    - buttonSize: ${parsed.buttonSize}<br>
+                    - buttonOpacity: ${parsed.buttonOpacity}<br>
+                    - hapticEnabled: ${parsed.hapticEnabled}<br>
+                    <strong>Refresh page to verify persistence!</strong>
+                `;
+            } catch (error) {
+                result.className = 'result error';
+                result.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+
+        function testLoad() {
+            window.location.reload();
+        }
+
+        function clearStorage() {
+            localStorage.clear();
+            const result = document.getElementById('result-persistence');
+            result.className = 'result success';
+            result.innerHTML = '✅ localStorage cleared! Refresh to verify default settings.';
+        }
+
+        // Test 3: Validation
+        function testValidation() {
+            const result = document.getElementById('result-validation');
+            try {
+                const tests = [];
+
+                // Test invalid controlScheme
+                manager.set('controlScheme', 'invalid');
+                tests.push(`controlScheme validation: ${manager.get('controlScheme') === 'joystick' ? '✅' : '❌'}`);
+
+                // Test invalid buttonSize
+                manager.set('buttonSize', 'invalid');
+                tests.push(`buttonSize validation: ${manager.get('buttonSize') === 'large' ? '✅' : '❌'}`);
+
+                // Test opacity clamping
+                manager.set('buttonOpacity', 0.1);
+                tests.push(`opacity min clamp: ${manager.get('buttonOpacity') === 0.3 ? '✅' : '❌'}`);
+
+                manager.set('buttonOpacity', 2.0);
+                tests.push(`opacity max clamp: ${manager.get('buttonOpacity') === 1.0 ? '✅' : '❌'}`);
+
+                // Test haptic boolean conversion
+                manager.set('hapticEnabled', 'yes');
+                tests.push(`haptic boolean: ${manager.get('hapticEnabled') === true ? '✅' : '❌'}`);
+
+                // Test button size multiplier
+                manager.set('buttonSize', 'small');
+                const smallMult = manager.getButtonSizeMultiplier();
+                tests.push(`small multiplier: ${smallMult === 0.8 ? '✅' : '❌'}`);
+
+                manager.set('buttonSize', 'large');
+                const largeMult = manager.getButtonSizeMultiplier();
+                tests.push(`large multiplier: ${largeMult === 1.2 ? '✅' : '❌'}`);
+
+                result.className = 'result success';
+                result.innerHTML = tests.join('<br>');
+            } catch (error) {
+                result.className = 'result error';
+                result.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+
+        // Test 4: Reset
+        function testReset() {
+            const result = document.getElementById('result-reset');
+            try {
+                manager.resetToDefaults();
+
+                const all = manager.getAll();
+
+                result.className = 'result success';
+                result.innerHTML = `
+                    ✅ Reset to defaults successful<br>
+                    - controlScheme: ${all.controlScheme}<br>
+                    - buttonSize: ${all.buttonSize}<br>
+                    - buttonOpacity: ${all.buttonOpacity}<br>
+                    - hapticEnabled: ${all.hapticEnabled}<br>
+                    - localStorage cleared: ${localStorage.getItem('barrelBlasterSettings') === null ? '✅' : '❌'}
+                `;
+            } catch (error) {
+                result.className = 'result error';
+                result.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+
+        // Test 5: Interactive Editor
+        function loadCurrentSettings() {
+            const all = manager.getAll();
+            document.getElementById('controlScheme').value = all.controlScheme;
+            document.getElementById('buttonSize').value = all.buttonSize;
+            document.getElementById('buttonOpacity').value = all.buttonOpacity;
+            document.getElementById('opacityValue').textContent = all.buttonOpacity;
+            document.getElementById('hapticEnabled').checked = all.hapticEnabled;
+
+            const result = document.getElementById('result-interactive');
+            result.className = 'result success';
+            result.innerHTML = '✅ Current settings loaded into editor';
+        }
+
+        function applySettings() {
+            const result = document.getElementById('result-interactive');
+            try {
+                const scheme = document.getElementById('controlScheme').value;
+                const size = document.getElementById('buttonSize').value;
+                const opacity = parseFloat(document.getElementById('buttonOpacity').value);
+                const haptic = document.getElementById('hapticEnabled').checked;
+
+                manager.set('controlScheme', scheme);
+                manager.set('buttonSize', size);
+                manager.set('buttonOpacity', opacity);
+                manager.set('hapticEnabled', haptic);
+                manager.save();
+
+                result.className = 'result success';
+                result.innerHTML = `
+                    ✅ Settings applied and saved<br>
+                    - Control Scheme: ${scheme}<br>
+                    - Button Size: ${size} (${manager.getButtonSizeMultiplier()}x)<br>
+                    - Opacity: ${opacity}<br>
+                    - Haptic: ${haptic}
+                `;
+            } catch (error) {
+                result.className = 'result error';
+                result.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+
+        // Update opacity display
+        document.getElementById('buttonOpacity').addEventListener('input', (e) => {
+            document.getElementById('opacityValue').textContent = e.target.value;
+        });
+
+        // Test 6: Display Current State
+        function displayCurrentState() {
+            const result = document.getElementById('current-state');
+            try {
+                const all = manager.getAll();
+                const stored = localStorage.getItem('barrelBlasterSettings');
+
+                result.className = 'result success';
+                result.innerHTML = `
+                    <strong>In-Memory Settings:</strong><br>
+                    - controlScheme: ${all.controlScheme}<br>
+                    - buttonSize: ${all.buttonSize} (${manager.getButtonSizeMultiplier()}x)<br>
+                    - buttonOpacity: ${all.buttonOpacity}<br>
+                    - hapticEnabled: ${all.hapticEnabled}<br>
+                    - dpad position: x=${all.buttonPositions.dpad.x}, y=${all.buttonPositions.dpad.y}<br>
+                    - jump position: x=${all.buttonPositions.jump.x}, y=${all.buttonPositions.jump.y}<br>
+                    <br>
+                    <strong>localStorage Status:</strong><br>
+                    ${stored ? '✅ Settings persisted in localStorage' : '❌ No data in localStorage'}
+                `;
+            } catch (error) {
+                result.className = 'result error';
+                result.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+
+        // Auto-display state on load
+        window.onload = () => {
+            displayCurrentState();
+            loadCurrentSettings();
+        };
+    </script>
+</body>
+</html>

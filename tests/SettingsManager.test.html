@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SettingsManager Test Suite</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #00ffff;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #ff0000;
+            text-shadow: 0 0 10px #ff0000;
+        }
+        h2 {
+            color: #ffff00;
+            margin-top: 30px;
+        }
+        .test {
+            margin: 10px 0;
+            padding: 10px;
+            background: #0a0a0a;
+            border-left: 4px solid #666;
+        }
+        .test.pass {
+            border-left-color: #00ff00;
+        }
+        .test.fail {
+            border-left-color: #ff0000;
+        }
+        .test-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .test-result {
+            font-size: 14px;
+            color: #aaa;
+        }
+        .summary {
+            margin-top: 30px;
+            padding: 20px;
+            background: #0a0a0a;
+            border: 2px solid #ff0000;
+        }
+        .pass { color: #00ff00; }
+        .fail { color: #ff0000; }
+    </style>
+</head>
+<body>
+    <h1>SettingsManager Test Suite</h1>
+    <p>Comprehensive TDD test suite for SettingsManager system</p>
+
+    <div id="test-results"></div>
+    <div id="summary" class="summary"></div>
+
+    <!-- Load SettingsManager -->
+    <script src="../js/systems/SettingsManager.js"></script>
+
+    <script>
+        // Test runner
+        const results = [];
+
+        function test(name, fn) {
+            try {
+                fn();
+                results.push({ name, passed: true, error: null });
+                console.log(`✅ ${name}`);
+            } catch (error) {
+                results.push({ name, passed: false, error: error.message });
+                console.error(`❌ ${name}:`, error.message);
+            }
+        }
+
+        function assert(condition, message) {
+            if (!condition) {
+                throw new Error(message || 'Assertion failed');
+            }
+        }
+
+        function assertEqual(actual, expected, message) {
+            if (actual !== expected) {
+                throw new Error(message || `Expected ${expected}, got ${actual}`);
+            }
+        }
+
+        function assertDeepEqual(actual, expected, message) {
+            if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+                throw new Error(message || `Expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+            }
+        }
+
+        // Clear localStorage before tests
+        localStorage.clear();
+
+        // ===========================
+        // DEFAULT SETTINGS TESTS
+        // ===========================
+
+        test('SettingsManager initializes with default settings', () => {
+            const manager = new SettingsManager();
+            const settings = manager.getAll();
+
+            assertEqual(settings.controlScheme, 'dpad', 'Default controlScheme should be dpad');
+            assertEqual(settings.buttonSize, 'medium', 'Default buttonSize should be medium');
+            assertEqual(settings.buttonOpacity, 0.6, 'Default buttonOpacity should be 0.6');
+            assertEqual(settings.hapticEnabled, true, 'Default hapticEnabled should be true');
+            assert(settings.buttonPositions, 'buttonPositions should exist');
+            assert(settings.buttonPositions.dpad, 'dpad positions should exist');
+            assert(settings.buttonPositions.jump, 'jump positions should exist');
+        });
+
+        test('Default button positions are correctly set', () => {
+            const manager = new SettingsManager();
+            const positions = manager.get('buttonPositions');
+
+            assertDeepEqual(positions.dpad, { x: 30, y: 610 }, 'Default dpad position incorrect');
+            assertDeepEqual(positions.jump, { x: 1130, y: 580 }, 'Default jump position incorrect');
+        });
+
+        // ===========================
+        // GET/SET METHODS TESTS
+        // ===========================
+
+        test('get() returns correct setting value', () => {
+            const manager = new SettingsManager();
+            assertEqual(manager.get('controlScheme'), 'dpad', 'get() should return correct value');
+            assertEqual(manager.get('buttonOpacity'), 0.6, 'get() should return correct value');
+        });
+
+        test('get() returns undefined for invalid key', () => {
+            const manager = new SettingsManager();
+            assertEqual(manager.get('invalidKey'), undefined, 'get() should return undefined for invalid key');
+        });
+
+        test('set() updates setting value', () => {
+            const manager = new SettingsManager();
+            manager.set('controlScheme', 'joystick');
+            assertEqual(manager.get('controlScheme'), 'joystick', 'set() should update value');
+        });
+
+        test('set() validates controlScheme values', () => {
+            const manager = new SettingsManager();
+            manager.set('controlScheme', 'invalid');
+            assertEqual(manager.get('controlScheme'), 'dpad', 'Invalid controlScheme should be rejected');
+        });
+
+        test('set() validates buttonSize values', () => {
+            const manager = new SettingsManager();
+            manager.set('buttonSize', 'invalid');
+            assertEqual(manager.get('buttonSize'), 'medium', 'Invalid buttonSize should be rejected');
+        });
+
+        test('set() validates buttonOpacity range (0.3 - 1.0)', () => {
+            const manager = new SettingsManager();
+            manager.set('buttonOpacity', 0.2);
+            assertEqual(manager.get('buttonOpacity'), 0.3, 'Opacity below 0.3 should clamp to 0.3');
+
+            manager.set('buttonOpacity', 1.5);
+            assertEqual(manager.get('buttonOpacity'), 1.0, 'Opacity above 1.0 should clamp to 1.0');
+
+            manager.set('buttonOpacity', 0.7);
+            assertEqual(manager.get('buttonOpacity'), 0.7, 'Valid opacity should be accepted');
+        });
+
+        test('set() validates hapticEnabled as boolean', () => {
+            const manager = new SettingsManager();
+            manager.set('hapticEnabled', 'yes');
+            assertEqual(manager.get('hapticEnabled'), true, 'Non-boolean should convert to boolean');
+
+            manager.set('hapticEnabled', 0);
+            assertEqual(manager.get('hapticEnabled'), false, '0 should convert to false');
+        });
+
+        test('set() validates buttonPositions structure', () => {
+            const manager = new SettingsManager();
+            manager.set('buttonPositions', { invalid: 'structure' });
+            assert(manager.get('buttonPositions').dpad, 'Invalid structure should be rejected');
+        });
+
+        // ===========================
+        // LOCALSTORAGE PERSISTENCE TESTS
+        // ===========================
+
+        test('save() persists settings to localStorage', () => {
+            localStorage.clear();
+            const manager = new SettingsManager();
+            manager.set('controlScheme', 'joystick');
+            manager.set('buttonOpacity', 0.8);
+            manager.save();
+
+            const stored = JSON.parse(localStorage.getItem('barrelBlasterSettings'));
+            assertEqual(stored.controlScheme, 'joystick', 'Settings should be saved to localStorage');
+            assertEqual(stored.buttonOpacity, 0.8, 'Settings should be saved to localStorage');
+        });
+
+        test('load() retrieves settings from localStorage', () => {
+            localStorage.clear();
+            const savedSettings = {
+                controlScheme: 'joystick',
+                buttonSize: 'large',
+                buttonOpacity: 0.9,
+                hapticEnabled: false,
+                buttonPositions: { dpad: { x: 50, y: 600 }, jump: { x: 1100, y: 550 } }
+            };
+            localStorage.setItem('barrelBlasterSettings', JSON.stringify(savedSettings));
+
+            const manager = new SettingsManager();
+            manager.load();
+
+            assertEqual(manager.get('controlScheme'), 'joystick', 'load() should retrieve saved settings');
+            assertEqual(manager.get('buttonSize'), 'large', 'load() should retrieve saved settings');
+            assertEqual(manager.get('buttonOpacity'), 0.9, 'load() should retrieve saved settings');
+            assertEqual(manager.get('hapticEnabled'), false, 'load() should retrieve saved settings');
+        });
+
+        test('load() handles corrupted localStorage data gracefully', () => {
+            localStorage.clear();
+            localStorage.setItem('barrelBlasterSettings', 'invalid json data');
+
+            const manager = new SettingsManager();
+            manager.load();
+
+            // Should fall back to defaults
+            assertEqual(manager.get('controlScheme'), 'dpad', 'Corrupted data should fall back to defaults');
+        });
+
+        test('load() handles missing localStorage gracefully', () => {
+            localStorage.clear();
+
+            const manager = new SettingsManager();
+            manager.load();
+
+            // Should use defaults
+            assertEqual(manager.get('controlScheme'), 'dpad', 'Missing data should use defaults');
+        });
+
+        test('Auto-load on construction when localStorage exists', () => {
+            localStorage.clear();
+            const savedSettings = {
+                controlScheme: 'joystick',
+                buttonSize: 'small',
+                buttonOpacity: 0.5,
+                hapticEnabled: false,
+                buttonPositions: { dpad: { x: 40, y: 620 }, jump: { x: 1150, y: 560 } }
+            };
+            localStorage.setItem('barrelBlasterSettings', JSON.stringify(savedSettings));
+
+            const manager = new SettingsManager();
+
+            assertEqual(manager.get('controlScheme'), 'joystick', 'Should auto-load on construction');
+            assertEqual(manager.get('buttonSize'), 'small', 'Should auto-load on construction');
+        });
+
+        // ===========================
+        // RESET FUNCTIONALITY TESTS
+        // ===========================
+
+        test('resetToDefaults() restores all default values', () => {
+            const manager = new SettingsManager();
+            manager.set('controlScheme', 'joystick');
+            manager.set('buttonSize', 'large');
+            manager.set('buttonOpacity', 0.9);
+            manager.set('hapticEnabled', false);
+
+            manager.resetToDefaults();
+
+            assertEqual(manager.get('controlScheme'), 'dpad', 'Should reset to default');
+            assertEqual(manager.get('buttonSize'), 'medium', 'Should reset to default');
+            assertEqual(manager.get('buttonOpacity'), 0.6, 'Should reset to default');
+            assertEqual(manager.get('hapticEnabled'), true, 'Should reset to default');
+        });
+
+        test('resetToDefaults() clears localStorage', () => {
+            localStorage.clear();
+            const manager = new SettingsManager();
+            manager.set('controlScheme', 'joystick');
+            manager.save();
+
+            assert(localStorage.getItem('barrelBlasterSettings'), 'localStorage should have data');
+
+            manager.resetToDefaults();
+
+            assertEqual(localStorage.getItem('barrelBlasterSettings'), null, 'localStorage should be cleared');
+        });
+
+        // ===========================
+        // LOCALSTORAGE DISABLED TESTS
+        // ===========================
+
+        test('Works when localStorage is disabled', () => {
+            // Simulate disabled localStorage
+            const originalSetItem = Storage.prototype.setItem;
+            const originalGetItem = Storage.prototype.getItem;
+
+            Storage.prototype.setItem = function() {
+                throw new Error('localStorage disabled');
+            };
+            Storage.prototype.getItem = function() {
+                throw new Error('localStorage disabled');
+            };
+
+            try {
+                const manager = new SettingsManager();
+                manager.set('controlScheme', 'joystick');
+                assertEqual(manager.get('controlScheme'), 'joystick', 'Should work without localStorage');
+
+                // save() and load() should not throw
+                manager.save();
+                manager.load();
+            } finally {
+                // Restore localStorage
+                Storage.prototype.setItem = originalSetItem;
+                Storage.prototype.getItem = originalGetItem;
+            }
+        });
+
+        // ===========================
+        // BUTTON SIZE MULTIPLIER TESTS
+        // ===========================
+
+        test('getButtonSizeMultiplier() returns correct values', () => {
+            const manager = new SettingsManager();
+
+            manager.set('buttonSize', 'small');
+            assertEqual(manager.getButtonSizeMultiplier(), 0.8, 'Small should be 0.8x');
+
+            manager.set('buttonSize', 'medium');
+            assertEqual(manager.getButtonSizeMultiplier(), 1.0, 'Medium should be 1.0x');
+
+            manager.set('buttonSize', 'large');
+            assertEqual(manager.getButtonSizeMultiplier(), 1.2, 'Large should be 1.2x');
+        });
+
+        // ===========================
+        // GETALL METHOD TEST
+        // ===========================
+
+        test('getAll() returns all settings', () => {
+            const manager = new SettingsManager();
+            const all = manager.getAll();
+
+            assert(all.controlScheme, 'getAll() should include controlScheme');
+            assert(all.buttonSize, 'getAll() should include buttonSize');
+            assert(typeof all.buttonOpacity === 'number', 'getAll() should include buttonOpacity');
+            assert(typeof all.hapticEnabled === 'boolean', 'getAll() should include hapticEnabled');
+            assert(all.buttonPositions, 'getAll() should include buttonPositions');
+        });
+
+        // ===========================
+        // EDGE CASES
+        // ===========================
+
+        test('Multiple SettingsManager instances share same localStorage', () => {
+            localStorage.clear();
+            const manager1 = new SettingsManager();
+            manager1.set('controlScheme', 'joystick');
+            manager1.save();
+
+            const manager2 = new SettingsManager();
+            manager2.load();
+            assertEqual(manager2.get('controlScheme'), 'joystick', 'Multiple instances should share localStorage');
+        });
+
+        test('set() with nested buttonPositions updates correctly', () => {
+            const manager = new SettingsManager();
+            const newPositions = {
+                dpad: { x: 100, y: 700 },
+                jump: { x: 1200, y: 650 }
+            };
+            manager.set('buttonPositions', newPositions);
+
+            const positions = manager.get('buttonPositions');
+            assertDeepEqual(positions, newPositions, 'Nested positions should update correctly');
+        });
+
+        // ===========================
+        // RENDER TEST RESULTS
+        // ===========================
+
+        function renderResults() {
+            const container = document.getElementById('test-results');
+            const summaryDiv = document.getElementById('summary');
+
+            let html = '';
+            let passed = 0;
+            let failed = 0;
+
+            results.forEach(result => {
+                const statusClass = result.passed ? 'pass' : 'fail';
+                const statusIcon = result.passed ? '✅' : '❌';
+
+                html += `
+                    <div class="test ${statusClass}">
+                        <div class="test-name">${statusIcon} ${result.name}</div>
+                        ${result.error ? `<div class="test-result fail">Error: ${result.error}</div>` : ''}
+                    </div>
+                `;
+
+                if (result.passed) passed++;
+                else failed++;
+            });
+
+            container.innerHTML = html;
+
+            const totalTests = results.length;
+            const passRate = ((passed / totalTests) * 100).toFixed(1);
+
+            summaryDiv.innerHTML = `
+                <h2>Test Summary</h2>
+                <p>Total Tests: ${totalTests}</p>
+                <p class="pass">Passed: ${passed}</p>
+                <p class="fail">Failed: ${failed}</p>
+                <p>Pass Rate: <span class="${failed === 0 ? 'pass' : 'fail'}">${passRate}%</span></p>
+                <p><strong>${failed === 0 ? '✅ ALL TESTS PASSED!' : '❌ SOME TESTS FAILED'}</strong></p>
+            `;
+        }
+
+        // Run all tests and render
+        renderResults();
+    </script>
+</body>
+</html>
