@@ -28,6 +28,9 @@ class GameState {
         // Initialize input handler
         this.inputHandler = new InputHandler();
 
+        // Initialize mobile controls (issue #145)
+        this.mobileControls = new MobileControls(canvas, this.inputHandler, Constants);
+
         // Initialize audio manager (issues #40, #41)
         this.audioManager = new AudioManager();
         this.initializeAudio();
@@ -222,6 +225,9 @@ class GameState {
         // Update level timer (issue #38)
         this.levelTimer += deltaTime;
 
+        // Update mobile controls (issue #145)
+        this.mobileControls.update(deltaTime);
+
         // Update player
         this.player.update(
             deltaTime,
@@ -363,6 +369,9 @@ class GameState {
 
         // Render UI
         this.renderUI(renderer);
+
+        // Render mobile controls (issue #145)
+        this.mobileControls.render(renderer.ctx);
     }
 
     /**
