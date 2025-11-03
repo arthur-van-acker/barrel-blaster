@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.49.0] - 2025-11-03
+
+### Added
+- **Mobile touch control constants** (issue #142)
+  - MOBILE_BUTTON_SIZE: 80px button dimensions
+  - MOBILE_DPAD_MARGIN: 30px margin for D-pad from left/bottom edges
+  - MOBILE_JUMP_MARGIN: 30px margin for jump button from right/bottom edges
+  - MOBILE_BUTTON_OPACITY: 0.6 default opacity for buttons
+  - MOBILE_BUTTON_OPACITY_PRESSED: 0.9 opacity when buttons are pressed
+  - MOBILE_TOUCH_DEAD_ZONE: 10px dead zone to prevent accidental inputs
+  - MOBILE_COLOR_DPAD: #FF0000 (red) matching retro platform color
+  - MOBILE_COLOR_JUMP: #FFFF00 (yellow) matching player color
+  - MOBILE_COLOR_BORDER: #FFFFFF for button visibility
+  - MOBILE_HAPTIC_ENABLED: true to enable tactile feedback
+  - MOBILE_HAPTIC_DURATION: 20ms vibration pulse duration
+  - MOBILE_BREAKPOINT: 768px screen width threshold for mobile detection
+
+### Technical Details
+- All constants follow existing naming convention with MOBILE_ prefix
+- Comprehensive JSDoc comments for each constant
+- Colors match established retro palette from existing constants
+- Constants object remains properly frozen with Object.freeze()
+- Ready for mobile touch control implementation
+- Supports responsive design breakpoint at 768px
+
 ## [0.48.0] - 2025-11-02
 
 ### Added

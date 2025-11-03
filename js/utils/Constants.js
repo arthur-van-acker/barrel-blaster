@@ -244,6 +244,80 @@ const Constants = {
 
     // Music file paths
     MUSIC_BACKGROUND: 'assets/sounds/music.ogg',
+
+    // ===========================
+    // MOBILE TOUCH CONTROL CONSTANTS
+    // ===========================
+
+    /**
+     * Size of mobile control buttons in pixels
+     * Used for both width and height of touch buttons
+     */
+    MOBILE_BUTTON_SIZE: 80,
+
+    /**
+     * Margin from screen edge for D-pad controls (left side)
+     * Distance in pixels from left and bottom edges
+     */
+    MOBILE_DPAD_MARGIN: 30,
+
+    /**
+     * Margin from screen edge for jump button (right side)
+     * Distance in pixels from right and bottom edges
+     */
+    MOBILE_JUMP_MARGIN: 30,
+
+    /**
+     * Default opacity for mobile control buttons
+     * Range: 0.0 (transparent) to 1.0 (opaque)
+     */
+    MOBILE_BUTTON_OPACITY: 0.6,
+
+    /**
+     * Opacity for mobile control buttons when pressed
+     * Higher opacity provides visual feedback for touch interaction
+     */
+    MOBILE_BUTTON_OPACITY_PRESSED: 0.9,
+
+    /**
+     * Touch dead zone radius in pixels
+     * Minimum movement required to register a touch direction
+     * Helps prevent accidental inputs from finger wobble
+     */
+    MOBILE_TOUCH_DEAD_ZONE: 10,
+
+    /**
+     * D-pad button color (matches retro platform red)
+     */
+    MOBILE_COLOR_DPAD: '#FF0000',
+
+    /**
+     * Jump button color (matches retro player yellow)
+     */
+    MOBILE_COLOR_JUMP: '#FFFF00',
+
+    /**
+     * Mobile button border color for visibility
+     */
+    MOBILE_COLOR_BORDER: '#FFFFFF',
+
+    /**
+     * Enable haptic feedback on mobile devices
+     * Provides tactile response when buttons are pressed
+     */
+    MOBILE_HAPTIC_ENABLED: true,
+
+    /**
+     * Duration of haptic feedback vibration in milliseconds
+     * Short pulse for button press confirmation
+     */
+    MOBILE_HAPTIC_DURATION: 20,
+
+    /**
+     * Screen width breakpoint for mobile detection in pixels
+     * Devices with width <= this value are considered mobile
+     */
+    MOBILE_BREAKPOINT: 768,
 };
 
 // Freeze the object to prevent modifications
