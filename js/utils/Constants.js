@@ -405,6 +405,46 @@ const Constants = {
     MOBILE_TRANSITION_EASING: 'easeOut',
 
     // ===========================
+    // MOBILE PERFORMANCE OPTIMIZATION CONSTANTS
+    // ===========================
+
+    /**
+     * Throttle interval for touchmove events in milliseconds
+     * 16ms = 60 FPS (1000ms / 60fps = 16.67ms)
+     * Prevents excessive event processing on high-frequency touch updates
+     */
+    MOBILE_TOUCHMOVE_THROTTLE_MS: 16,
+
+    /**
+     * Enable passive event listeners for better scroll performance
+     * Passive listeners tell browser preventDefault() won't be called,
+     * allowing scroll to start immediately without waiting for JS
+     * Note: touchstart/touchend remain non-passive to prevent defaults
+     */
+    MOBILE_PASSIVE_LISTENERS: false,
+
+    /**
+     * Enable performance profiling and logging
+     * When true, logs touch event processing time and FPS metrics
+     * Should be false in production for optimal performance
+     */
+    MOBILE_PERFORMANCE_LOGGING: false,
+
+    /**
+     * Maximum touch event processing time in milliseconds
+     * If processing exceeds this, a warning is logged (when logging enabled)
+     * Target: <16.67ms to maintain 60 FPS
+     */
+    MOBILE_MAX_EVENT_TIME_MS: 16,
+
+    /**
+     * Enable dirty flag optimization for rendering
+     * Only redraws buttons when their state has changed
+     * Significantly reduces canvas operations during steady state
+     */
+    MOBILE_DIRTY_FLAG_OPTIMIZATION: true,
+
+    // ===========================
     // MOBILE TUTORIAL OVERLAY CONSTANTS
     // ===========================
 
