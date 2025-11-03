@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InputHandler Tests - Touch Button State</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+        }
+        .test-suite {
+            margin-bottom: 30px;
+            border: 1px solid #333;
+            padding: 15px;
+            background: #0a0a0a;
+        }
+        .test-case {
+            margin: 10px 0;
+            padding: 5px;
+        }
+        .test-pass {
+            color: #00ff00;
+        }
+        .test-fail {
+            color: #ff0000;
+            font-weight: bold;
+        }
+        .test-summary {
+            margin-top: 20px;
+            padding: 15px;
+            border: 2px solid #00ff00;
+            background: #0a0a0a;
+        }
+        h1, h2 {
+            color: #00ffff;
+        }
+    </style>
+</head>
+<body>
+    <h1>InputHandler Touch Button State Tests</h1>
+    <div id="test-results"></div>
+
+    <!-- Load dependencies -->
+    <script src="../js/utils/Vector2D.js"></script>
+    <script src="../js/utils/Constants.js"></script>
+    <script src="../js/systems/InputHandler.js"></script>
+
+    <script>
+        // Simple test framework
+        class TestRunner {
+            constructor() {
+                this.tests = [];
+                this.passed = 0;
+                this.failed = 0;
+            }
+
+            test(name, fn) {
+                this.tests.push({ name, fn });
+            }
+
+            async run() {
+                const resultsDiv = document.getElementById('test-results');
+
+                for (const test of this.tests) {
+                    try {
+                        await test.fn();
+                        this.passed++;
+                        resultsDiv.innerHTML += `<div class="test-case test-pass">✓ ${test.name}</div>`;
+                    } catch (error) {
+                        this.failed++;
+                        resultsDiv.innerHTML += `<div class="test-case test-fail">✗ ${test.name}<br>  ${error.message}</div>`;
+                    }
+                }
+
+                resultsDiv.innerHTML += `
+                    <div class="test-summary">
+                        <h2>Test Summary</h2>
+                        <p>Total: ${this.tests.length}</p>
+                        <p class="test-pass">Passed: ${this.passed}</p>
+                        <p class="test-fail">Failed: ${this.failed}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function assert(condition, message) {
+            if (!condition) {
+                throw new Error(message || 'Assertion failed');
+            }
+        }
+
+        function assertEqual(actual, expected, message) {
+            if (actual !== expected) {
+                throw new Error(message || `Expected ${expected}, got ${actual}`);
+            }
+        }
+
+        // Run tests
+        const runner = new TestRunner();
+
+        // Test Suite 1: Touch Button State Object
+        runner.test('InputHandler should have touchButtons object', () => {
+            const handler = new InputHandler();
+            assert(handler.touchButtons !== undefined, 'touchButtons should be defined');
+            assert(typeof handler.touchButtons === 'object', 'touchButtons should be an object');
+        });
+
+        runner.test('touchButtons should have all required button properties', () => {
+            const handler = new InputHandler();
+            assert(handler.touchButtons.hasOwnProperty('left'), 'touchButtons should have left property');
+            assert(handler.touchButtons.hasOwnProperty('right'), 'touchButtons should have right property');
+            assert(handler.touchButtons.hasOwnProperty('up'), 'touchButtons should have up property');
+            assert(handler.touchButtons.hasOwnProperty('down'), 'touchButtons should have down property');
+            assert(handler.touchButtons.hasOwnProperty('jump'), 'touchButtons should have jump property');
+        });
+
+        runner.test('touchButtons should initialize all buttons to false', () => {
+            const handler = new InputHandler();
+            assertEqual(handler.touchButtons.left, false, 'left should be false');
+            assertEqual(handler.touchButtons.right, false, 'right should be false');
+            assertEqual(handler.touchButtons.up, false, 'up should be false');
+            assertEqual(handler.touchButtons.down, false, 'down should be false');
+            assertEqual(handler.touchButtons.jump, false, 'jump should be false');
+        });
+
+        // Test Suite 2: setTouchButton Method
+        runner.test('InputHandler should have setTouchButton method', () => {
+            const handler = new InputHandler();
+            assert(typeof handler.setTouchButton === 'function', 'setTouchButton should be a function');
+        });
+
+        runner.test('setTouchButton should set button state to true', () => {
+            const handler = new InputHandler();
+            handler.setTouchButton('left', true);
+            assertEqual(handler.touchButtons.left, true, 'left should be true after setting');
+        });
+
+        runner.test('setTouchButton should set button state to false', () => {
+            const handler = new InputHandler();
+            handler.touchButtons.left = true;
+            handler.setTouchButton('left', false);
+            assertEqual(handler.touchButtons.left, false, 'left should be false after unsetting');
+        });
+
+        runner.test('setTouchButton should handle all button types', () => {
+            const handler = new InputHandler();
+            const buttons = ['left', 'right', 'up', 'down', 'jump'];
+
+            buttons.forEach(button => {
+                handler.setTouchButton(button, true);
+                assertEqual(handler.touchButtons[button], true, `${button} should be true`);
+
+                handler.setTouchButton(button, false);
+                assertEqual(handler.touchButtons[button], false, `${button} should be false`);
+            });
+        });
+
+        // Test Suite 3: Multi-touch Support
+        runner.test('setTouchButton should support multiple buttons pressed simultaneously', () => {
+            const handler = new InputHandler();
+            handler.setTouchButton('left', true);
+            handler.setTouchButton('jump', true);
+
+            assertEqual(handler.touchButtons.left, true, 'left should be true');
+            assertEqual(handler.touchButtons.jump, true, 'jump should be true');
+            assertEqual(handler.touchButtons.right, false, 'right should still be false');
+        });
+
+        // Test Suite 4: Integration with isLeftDown
+        runner.test('isLeftDown should return true when keyboard left is pressed', () => {
+            const handler = new InputHandler();
+            handler.keys['ArrowLeft'] = true;
+            assertEqual(handler.isLeftDown(), true, 'isLeftDown should return true for keyboard');
+        });
+
+        runner.test('isLeftDown should return true when touch left is pressed', () => {
+            const handler = new InputHandler();
+            handler.setTouchButton('left', true);
+            assertEqual(handler.isLeftDown(), true, 'isLeftDown should return true for touch');
+        });
+
+        runner.test('isLeftDown should return true when BOTH keyboard and touch are pressed', () => {
+            const handler = new InputHandler();
+            handler.keys['ArrowLeft'] = true;
+            handler.setTouchButton('left', true);
+            assertEqual(handler.isLeftDown(), true, 'isLeftDown should return true for both inputs');
+        });
+
+        runner.test('isLeftDown should return false when neither input is pressed', () => {
+            const handler = new InputHandler();
+            assertEqual(handler.isLeftDown(), false, 'isLeftDown should return false when nothing pressed');
+        });
+
+        // Test Suite 5: Integration with isRightDown
+        runner.test('isRightDown should return true when keyboard right is pressed', () => {
+            const handler = new InputHandler();
+            handler.keys['ArrowRight'] = true;
+            assertEqual(handler.isRightDown(), true, 'isRightDown should return true for keyboard');
+        });
+
+        runner.test('isRightDown should return true when touch right is pressed', () => {
+            const handler = new InputHandler();
+            handler.setTouchButton('right', true);
+            assertEqual(handler.isRightDown(), true, 'isRightDown should return true for touch');
+        });
+
+        // Test Suite 6: Integration with isUpDown
+        runner.test('isUpDown should return true when keyboard up is pressed', () => {
+            const handler = new InputHandler();
+            handler.keys['ArrowUp'] = true;
+            assertEqual(handler.isUpDown(), true, 'isUpDown should return true for keyboard');
+        });
+
+        runner.test('isUpDown should return true when touch up is pressed', () => {
+            const handler = new InputHandler();
+            handler.setTouchButton('up', true);
+            assertEqual(handler.isUpDown(), true, 'isUpDown should return true for touch');
+        });
+
+        // Test Suite 7: Integration with isDownDown
+        runner.test('isDownDown should return true when keyboard down is pressed', () => {
+            const handler = new InputHandler();
+            handler.keys['ArrowDown'] = true;
+            assertEqual(handler.isDownDown(), true, 'isDownDown should return true for keyboard');
+        });
+
+        runner.test('isDownDown should return true when touch down is pressed', () => {
+            const handler = new InputHandler();
+            handler.setTouchButton('down', true);
+            assertEqual(handler.isDownDown(), true, 'isDownDown should return true for touch');
+        });
+
+        // Test Suite 8: Integration with isJumpPressed
+        runner.test('isJumpPressed should return true when keyboard space is pressed', () => {
+            const handler = new InputHandler();
+            handler.keysPressed[' '] = true;
+            assertEqual(handler.isJumpPressed(), true, 'isJumpPressed should return true for keyboard');
+        });
+
+        runner.test('isJumpPressed should return true when touch jump is pressed', () => {
+            const handler = new InputHandler();
+            handler.setTouchButton('jump', true);
+            assertEqual(handler.isJumpPressed(), true, 'isJumpPressed should return true for touch');
+        });
+
+        runner.test('isJumpPressed should return true when BOTH keyboard and touch are pressed', () => {
+            const handler = new InputHandler();
+            handler.keysPressed[' '] = true;
+            handler.setTouchButton('jump', true);
+            assertEqual(handler.isJumpPressed(), true, 'isJumpPressed should return true for both inputs');
+        });
+
+        // Test Suite 9: Backward Compatibility
+        runner.test('Keyboard controls should work unchanged', () => {
+            const handler = new InputHandler();
+
+            // Simulate keyboard presses
+            handler.keys['ArrowLeft'] = true;
+            handler.keys['ArrowRight'] = true;
+            handler.keys['ArrowUp'] = true;
+            handler.keys['ArrowDown'] = true;
+            handler.keysPressed[' '] = true;
+
+            assertEqual(handler.isLeftDown(), true, 'Keyboard left should work');
+            assertEqual(handler.isRightDown(), true, 'Keyboard right should work');
+            assertEqual(handler.isUpDown(), true, 'Keyboard up should work');
+            assertEqual(handler.isDownDown(), true, 'Keyboard down should work');
+            assertEqual(handler.isJumpPressed(), true, 'Keyboard jump should work');
+        });
+
+        // Test Suite 10: Edge Cases
+        runner.test('setTouchButton should handle invalid button names gracefully', () => {
+            const handler = new InputHandler();
+            // Should not throw error
+            handler.setTouchButton('invalid', true);
+            assert(true, 'Should handle invalid button names without error');
+        });
+
+        runner.test('Touch state should be independent of keyboard state', () => {
+            const handler = new InputHandler();
+            handler.setTouchButton('left', true);
+            handler.keys['ArrowLeft'] = false;
+
+            // isLeftDown should still return true because touch is true
+            assertEqual(handler.isLeftDown(), true, 'Touch state should work independently');
+        });
+
+        // Run all tests
+        runner.run();
+    </script>
+</body>
+</html>

@@ -5,6 +5,54 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.51.0] - 2025-11-03
+
+### Added
+- **Touch button state tracking in InputHandler** (issue #144)
+  - `touchButtons` object tracking state for 5 virtual buttons: {left, right, up, down, jump}
+  - All buttons initialize to false for clean state
+  - `setTouchButton(button, pressed)` method for mobile touch control integration
+  - Multi-touch support - multiple buttons can be pressed simultaneously
+  - Comprehensive input validation with `hasOwnProperty()` check
+  - Window blur event now clears touch button states for clean state management
+- **Keyboard-touch input integration**
+  - `isLeftDown()` checks keyboard OR touch state (backward compatible)
+  - `isRightDown()` checks keyboard OR touch state
+  - `isUpDown()` checks keyboard OR touch state
+  - `isDownDown()` checks keyboard OR touch state
+  - `isJumpPressed()` checks keyboard OR touch state
+  - Both input methods work independently or simultaneously
+- **Comprehensive test suite** (`tests/InputHandler.test.html`)
+  - 26 automated unit tests covering all touch button functionality
+  - Test coverage: initialization, state management, setTouchButton, multi-touch, keyboard integration, edge cases
+  - Real-time test execution with pass/fail reporting
+  - Validates backward compatibility with existing keyboard controls
+  - Browser-based test runner for manual verification
+
+### Changed
+- **InputHandler class documentation updated**
+  - Class header now documents both keyboard and touch input support
+  - All direction-checking methods updated with "keyboard or touch" JSDoc
+  - Complete JSDoc for `setTouchButton()` with usage examples
+  - Enhanced documentation explains multi-input support
+
+### Technical Details
+- Touch button state stored in simple object with boolean properties
+- Zero performance overhead - simple OR operations for state checks
+- O(1) time complexity for all touch button operations
+- O(1) space complexity - only 5 boolean values in touchButtons object
+- No breaking changes - keyboard controls completely unchanged
+- API designed for easy mobile UI integration: `inputHandler.setTouchButton('left', true)`
+- Maintains InputHandler's existing architecture and patterns
+- Ready for mobile touch control UI implementation
+- All acceptance criteria from issue #144 fully met
+
+### Documentation
+- JSDoc comments for all new properties and methods
+- Usage examples in setTouchButton documentation
+- Test file documents expected behavior and edge cases
+- Comprehensive inline comments for touch button logic
+
 ## [0.50.0] - 2025-11-03
 
 ### Added

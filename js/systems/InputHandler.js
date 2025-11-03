@@ -1,8 +1,12 @@
 /**
  * InputHandler.js
  *
- * Manages keyboard input for the Donkey Kong game.
- * Tracks key states and provides methods to query current input state.
+ * Manages keyboard and touch input for the Donkey Kong game.
+ * Tracks key states, touch button states, and provides methods to query current input state.
+ *
+ * Supports both keyboard controls (arrow keys, spacebar) and touch controls
+ * (virtual buttons for mobile devices). Input methods can be used simultaneously
+ * for multi-input support.
  */
 
 class InputHandler {
@@ -12,6 +16,15 @@ class InputHandler {
 
         // Track keys that were just pressed this frame
         this.keysPressed = {};
+
+        // Track touch button states for mobile controls
+        this.touchButtons = {
+            left: false,
+            right: false,
+            up: false,
+            down: false,
+            jump: false
+        };
 
         // Valid game keys that should have preventDefault called
         this.gameKeys = [
@@ -80,6 +93,14 @@ class InputHandler {
     handleBlur() {
         this.keys = {};
         this.keysPressed = {};
+        // Also clear touch button states on blur
+        this.touchButtons = {
+            left: false,
+            right: false,
+            up: false,
+            down: false,
+            jump: false
+        };
     }
 
     /**
@@ -110,43 +131,68 @@ class InputHandler {
     }
 
     /**
-     * Check if left arrow key is down
+     * Set the state of a touch button
+     * Used by mobile touch controls to register button presses
+     *
+     * @param {string} button - The button name ('left', 'right', 'up', 'down', 'jump')
+     * @param {boolean} pressed - Whether the button is pressed (true) or released (false)
+     *
+     * @example
+     * // When user touches the left button
+     * inputHandler.setTouchButton('left', true);
+     *
+     * // When user releases the left button
+     * inputHandler.setTouchButton('left', false);
+     */
+    setTouchButton(button, pressed) {
+        if (this.touchButtons.hasOwnProperty(button)) {
+            this.touchButtons[button] = pressed;
+        }
+    }
+
+    /**
+     * Check if left arrow key or touch button is down
+     * Supports both keyboard and touch input
      * @returns {boolean}
      */
     isLeftDown() {
-        return this.isKeyDown('ArrowLeft');
+        return this.isKeyDown('ArrowLeft') || this.touchButtons.left;
     }
 
     /**
-     * Check if right arrow key is down
+     * Check if right arrow key or touch button is down
+     * Supports both keyboard and touch input
      * @returns {boolean}
      */
     isRightDown() {
-        return this.isKeyDown('ArrowRight');
+        return this.isKeyDown('ArrowRight') || this.touchButtons.right;
     }
 
     /**
-     * Check if up arrow key is down
+     * Check if up arrow key or touch button is down
+     * Supports both keyboard and touch input
      * @returns {boolean}
      */
     isUpDown() {
-        return this.isKeyDown('ArrowUp');
+        return this.isKeyDown('ArrowUp') || this.touchButtons.up;
     }
 
     /**
-     * Check if down arrow key is down
+     * Check if down arrow key or touch button is down
+     * Supports both keyboard and touch input
      * @returns {boolean}
      */
     isDownDown() {
-        return this.isKeyDown('ArrowDown');
+        return this.isKeyDown('ArrowDown') || this.touchButtons.down;
     }
 
     /**
-     * Check if spacebar was just pressed
+     * Check if spacebar or touch jump button was just pressed
+     * Supports both keyboard and touch input
      * @returns {boolean}
      */
     isJumpPressed() {
-        return this.isKeyPressed(' ') || this.isKeyPressed('Space');
+        return this.isKeyPressed(' ') || this.isKeyPressed('Space') || this.touchButtons.jump;
     }
 
     /**
