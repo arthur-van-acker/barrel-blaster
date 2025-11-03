@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.66.0] - 2025-11-03
+
+### Added
+
+- **Mobile controls documentation in rules.html** (issue #159)
+  - New "Mobile Touch Controls" section with comprehensive mobile gameplay instructions
+  - D-Pad controls documentation: left, right, up, down button functionality
+  - Jump button documentation: tap for short jump, hold for higher jump
+  - Multi-touch support explanation: simultaneous movement and jumping
+  - "Customizing Mobile Controls" subsection covering settings panel options:
+    - Button size adjustment (50%-150%)
+    - Button opacity adjustment (40%-100%)
+    - Haptic feedback toggle
+    - Control scheme toggle (D-pad/Joystick)
+  - "Alternative Input" subsection documenting external Bluetooth keyboard support
+  - Renamed "Controls" section to "Keyboard Controls" for clarity
+  - Maintains retro aesthetic styling consistent with page design
+  - Responsive formatting for mobile viewing
+
 ## [0.65.0] - 2025-11-03
 
 ### Added
